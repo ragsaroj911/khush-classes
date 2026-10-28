@@ -8,10 +8,10 @@ export const isResendConfigured = Boolean(
 
 export const resendClient = isResendConfigured ? new Resend(resendApiKey) : null;
 
-const defaultFrom = process.env.RESEND_FROM_EMAIL || 'Fee Portal <onboarding@resend.dev>';
-const instituteName = process.env.NEXT_PUBLIC_INSTITUTE_NAME || 'Apex International Institute';
-const institutePhone = process.env.NEXT_PUBLIC_INSTITUTE_PHONE || '+91 120 4567 890';
-const instituteEmail = process.env.NEXT_PUBLIC_INSTITUTE_EMAIL || 'fees@apex-institute.edu';
+const defaultFrom = process.env.RESEND_FROM_EMAIL || 'Khush Classes <onboarding@resend.dev>';
+const instituteName = process.env.NEXT_PUBLIC_INSTITUTE_NAME || 'Khush Classes';
+const institutePhone = process.env.NEXT_PUBLIC_INSTITUTE_PHONE || '+91 98765 43210';
+const instituteEmail = process.env.NEXT_PUBLIC_INSTITUTE_EMAIL || 'fees@khushclasses.com';
 
 export interface SendReminderParams {
   toEmail: string;
@@ -247,3 +247,4 @@ export async function sendPaymentReceiptEmail(params: SendReceiptParams): Promis
     return { success: false, error: message };
   }
 }
+

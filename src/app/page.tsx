@@ -24,6 +24,7 @@ import {
   Eye,
   CheckCircle2,
   Clock,
+  Sparkles,
 } from 'lucide-react';
 
 export default function DashboardPage() {
@@ -74,32 +75,38 @@ export default function DashboardPage() {
       {/* Welcome Banner */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-            Finance & Fee Collection Overview
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-xs font-black uppercase tracking-widest text-emerald-600 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-200">
+              Khush Classes
+            </span>
+            <span className="text-xs text-slate-400 font-medium">Fee Management Hub</span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 dark:text-white">
+            Finance & Fee Collection Overview (₹)
           </h1>
           <p className="text-sm text-slate-500 mt-1">
-            Real-time billing monitor, payments processing, and overdue recovery.
+            Real-time student billing monitor, Indian Rupee collections, and overdue recovery.
           </p>
         </div>
 
         <div className="flex items-center gap-3">
-          <Link href="/payments">
-            <Button variant="outline" size="sm" className="gap-2 text-xs">
-              <Receipt className="h-3.5 w-3.5" />
-              All Receipts
+          <Link href="/students/new">
+            <Button size="sm" className="gap-2 text-xs font-bold bg-slate-900 hover:bg-slate-800 text-white shadow-md">
+              <PlusCircle className="h-4 w-4 text-emerald-400" />
+              Add Student (Wizard)
             </Button>
           </Link>
 
           <Button
             size="sm"
-            className="gap-2 text-xs bg-emerald-600 hover:bg-emerald-700 text-white"
+            className="gap-2 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-600/20"
             onClick={() => {
               setSelectedStudentForPayment(null);
               setIsPaymentModalOpen(true);
             }}
           >
-            <PlusCircle className="h-3.5 w-3.5" />
-            Collect Fee
+            <Receipt className="h-3.5 w-3.5" />
+            Collect Fee (₹)
           </Button>
         </div>
       </div>
@@ -173,6 +180,36 @@ export default function DashboardPage() {
             {metrics.paidStudentsCount} cleared &bull; {metrics.partialStudentsCount} partial
           </p>
         </Card>
+      </div>
+
+      {/* Eye-Catching Add Student Process Banner */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-6 sm:p-7 shadow-xl border border-indigo-900/40">
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="space-y-2 max-w-xl">
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                <Sparkles className="h-3 w-3" />
+                Khush Classes Admissions
+              </span>
+              <span className="text-xs text-slate-400 font-semibold">• 4-Step Guided Flow</span>
+            </div>
+            <h2 className="text-xl sm:text-2xl font-black tracking-tight text-white">
+              Student Registration & Fee Assessment Process
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-300">
+              Interactive 4-step guided wizard: Student profile, coaching batch, itemized fee breakdown in Indian Rupees (₹), scholarship waiver calculator, and instant admission confirmation.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-3 shrink-0">
+            <Link href="/students/new">
+              <Button size="lg" className="bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-600 hover:to-teal-500 text-slate-950 font-black text-sm px-6 h-12 shadow-lg shadow-emerald-500/25 gap-2 rounded-xl">
+                <PlusCircle className="h-5 w-5" />
+                Start Student Registration
+              </Button>
+            </Link>
+          </div>
+        </div>
       </div>
 
       {/* Main Two-Column Section: Urgent Dues & Recent Payments */}
@@ -401,3 +438,4 @@ export default function DashboardPage() {
     </div>
   );
 }
+

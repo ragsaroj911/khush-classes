@@ -192,3 +192,4 @@ export function PaymentHistoryTable({ payments }: PaymentHistoryTableProps) {
     </div>
   );
 }
+

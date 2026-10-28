@@ -153,11 +153,17 @@ export function FinancialReports() {
       {/* Top Banner & Export */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-slate-900 dark:text-white">
-            Collection Analytics & Audit Reports
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-xs font-black uppercase tracking-widest text-emerald-600 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-200">
+              Khush Classes
+            </span>
+            <span className="text-xs text-slate-400 font-medium">Financial Analytics</span>
+          </div>
+          <h2 className="text-2xl font-black text-slate-900 dark:text-white">
+            Collection Analytics & Revenue Reports (₹)
           </h2>
           <p className="text-sm text-slate-500">
-            Monthly cash flows, collection efficiency, and multi-channel revenue distribution.
+            Monthly cash flows in Indian Rupees (₹), collection efficiency, and multi-channel revenue distribution.
           </p>
         </div>
 
@@ -364,3 +370,4 @@ export function FinancialReports() {
     </div>
   );
 }
+

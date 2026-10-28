@@ -99,11 +99,17 @@ export function DueRemindersManager() {
       {/* Top Banner and Bulk Action */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-slate-900 dark:text-white">
-            Fee Due Reminders & Automated Notices
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-xs font-black uppercase tracking-widest text-emerald-600 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-200">
+              Khush Classes
+            </span>
+            <span className="text-xs text-slate-400 font-medium">Email Dispatcher</span>
+          </div>
+          <h2 className="text-2xl font-black text-slate-900 dark:text-white">
+            Fee Due Reminders & Automated Notices (₹)
           </h2>
           <p className="text-sm text-slate-500">
-            Dispatch personalized email notifications and payment links powered by Resend.
+            Dispatch personalized Indian Rupee fee notices and payment links powered by Resend.
           </p>
         </div>
 
@@ -309,3 +315,4 @@ export function DueRemindersManager() {
     </div>
   );
 }
+

@@ -34,7 +34,7 @@ const NAV_ITEMS = [
 
 export function Sidebar({ className }: { className?: string }) {
   const pathname = usePathname();
-  const instituteName = process.env.NEXT_PUBLIC_INSTITUTE_NAME || 'Apex International';
+  const instituteName = process.env.NEXT_PUBLIC_INSTITUTE_NAME || 'Khush Classes';
 
   return (
     <aside
@@ -146,33 +146,56 @@ export function Sidebar({ className }: { className?: string }) {
   );
 }
 
-export function MobileNavbar() {
+export function MobileNavbar({
+  onBack,
+  isHome,
+}: {
+  onBack?: () => void;
+  isHome?: boolean;
+}) {
   const [isOpen, setIsOpen] = React.useState(false);
   const pathname = usePathname();
-  const instituteName = process.env.NEXT_PUBLIC_INSTITUTE_NAME || 'Apex International';
+  const instituteName = process.env.NEXT_PUBLIC_INSTITUTE_NAME || 'Khush Classes';
 
   React.useEffect(() => {
     setIsOpen(false);
   }, [pathname]);
 
   return (
-    <header className="lg:hidden sticky top-0 z-40 flex items-center justify-between px-4 py-3 bg-white/95 dark:bg-slate-950/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
-      <Link href="/" className="flex items-center gap-2.5">
-        <div className="h-8 w-8 rounded-lg bg-slate-900 text-white flex items-center justify-center font-bold">
+    <header className="lg:hidden sticky top-0 z-40 flex items-center justify-between px-4 py-2.5 bg-white/95 dark:bg-slate-950/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+      <Link href="/" className="flex items-center gap-2">
+        <div className="h-8 w-8 rounded-lg bg-slate-900 text-white flex items-center justify-center font-bold shadow">
           <GraduationCap className="h-4 w-4" />
         </div>
-        <span className="font-bold text-sm text-slate-900 dark:text-white">
-          {instituteName}
-        </span>
+        <div>
+          <span className="font-extrabold text-sm text-slate-900 dark:text-white block leading-tight">
+            {instituteName}
+          </span>
+          <span className="text-[10px] text-emerald-600 font-bold uppercase tracking-wider block">
+            Fee Portal
+          </span>
+        </div>
       </Link>
 
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="p-2 rounded-lg text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
-        aria-label="Toggle menu"
-      >
-        {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-      </button>
+      <div className="flex items-center gap-2">
+        {!isHome && onBack && (
+          <button
+            onClick={onBack}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-rose-600 to-amber-600 text-white font-black text-xs uppercase tracking-wider shadow-md hover:scale-105 active:scale-95 transition-all"
+            title="Go back"
+          >
+            ← BACK
+          </button>
+        )}
+
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="p-2 rounded-lg text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
+          aria-label="Toggle menu"
+        >
+          {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+        </button>
+      </div>
 
       {isOpen && (
         <div className="fixed inset-0 top-[53px] z-50 bg-white dark:bg-slate-950 p-6 flex flex-col justify-between overflow-y-auto">
@@ -209,3 +232,4 @@ export function MobileNavbar() {
     </header>
   );
 }
+

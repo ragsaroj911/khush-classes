@@ -33,21 +33,27 @@ export default function PaymentsPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-            Payment Receipts & Collections
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-xs font-black uppercase tracking-widest text-emerald-600 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-200">
+              Khush Classes
+            </span>
+            <span className="text-xs text-slate-400 font-medium">Collections Register</span>
+          </div>
+          <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
+            Fee Receipts & Collections Ledger (₹)
           </h1>
           <p className="text-sm text-slate-500 mt-1">
-            Search payment history, verify transactions, and download official PDF receipts.
+            Search payment history in Indian Rupees (₹), verify transactions, and download official PDF receipts.
           </p>
         </div>
 
         <Button
           size="sm"
-          className="gap-2 text-xs bg-emerald-600 hover:bg-emerald-700 text-white"
+          className="gap-2 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-600/20"
           onClick={() => setIsRecordOpen(true)}
         >
-          <Receipt className="h-3.5 w-3.5" />
-          Record New Payment
+          <Receipt className="h-4 w-4" />
+          Collect New Fee (₹)
         </Button>
       </div>
 
@@ -65,3 +71,4 @@ export default function PaymentsPage() {
     </div>
   );
 }
+

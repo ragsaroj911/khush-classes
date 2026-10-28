@@ -14,3 +14,4 @@ export function getServerSupabase() {
   if (!isServerSupabaseConfigured) return null;
   return createClient(supabaseUrl, supabaseServiceKey);
 }
+

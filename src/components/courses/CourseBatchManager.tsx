@@ -145,11 +145,17 @@ export function CourseBatchManager() {
       {/* Top Banner and Quick Actions */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl font-bold text-slate-900 dark:text-white">
-            Academic Courses & Batches
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-xs font-black uppercase tracking-widest text-emerald-600 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-200">
+              Khush Classes
+            </span>
+            <span className="text-xs text-slate-400 font-medium">Academic Programs</span>
+          </div>
+          <h2 className="text-2xl font-black text-slate-900 dark:text-white">
+            Courses, Batches & Fee Structure (₹)
           </h2>
           <p className="text-sm text-slate-500">
-            Define degree programs, cohorts, and itemized fee structure schedules.
+            Define coaching programs, class sections, and itemized Indian Rupee fee structures.
           </p>
         </div>
 
@@ -541,3 +547,4 @@ export function CourseBatchManager() {
     </div>
   );
 }
+

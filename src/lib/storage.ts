@@ -320,7 +320,7 @@ export const INITIAL_REMINDERS: ReminderLog[] = [
     recipient_email: 'rohan.verma@example.com',
     amount_due: 80000,
     due_date: '2024-10-15',
-    subject: 'Urgent: Pending Fee Due Reminder (STU-2024-003) - Apex International Institute',
+    subject: 'Urgent: Pending Fee Due Reminder (STU-2024-003) - Khush Classes',
     status: 'sent',
     resend_email_id: 'resend_demo_9824',
     sent_at: '2024-10-16T10:30:00Z',
@@ -770,3 +770,4 @@ export const DataService = {
     }
   },
 };
+

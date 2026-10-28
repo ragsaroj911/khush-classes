@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import Link from 'next/link';
 import { StudentTable } from '@/components/students/StudentTable';
 import { StudentDetailModal } from '@/components/students/StudentDetailModal';
 import { StudentFormModal } from '@/components/students/StudentFormModal';
@@ -96,11 +97,17 @@ export default function StudentsPage() {
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-            Student Fee Registry
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-xs font-black uppercase tracking-widest text-emerald-600 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-200">
+              Khush Classes
+            </span>
+            <span className="text-xs text-slate-400 font-medium">Students Directory</span>
+          </div>
+          <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
+            Student Fee Registry & Admissions (₹)
           </h1>
           <p className="text-sm text-slate-500 mt-1">
-            Search, manage student profiles, monitor ledger balances, and record payments.
+            Search student profiles, track Indian Rupee fee ledger balances, and record payments.
           </p>
         </div>
 
@@ -109,23 +116,21 @@ export default function StudentsPage() {
             variant="outline"
             size="sm"
             onClick={handleExportStudentsCsv}
-            className="gap-2 text-xs"
+            className="gap-2 text-xs font-semibold"
           >
             <Download className="h-3.5 w-3.5" />
             Export Roster
           </Button>
 
-          <Button
-            size="sm"
-            className="gap-2 text-xs bg-slate-900 text-white"
-            onClick={() => {
-              setStudentToEdit(null);
-              setIsFormOpen(true);
-            }}
-          >
-            <PlusCircle className="h-3.5 w-3.5" />
-            Register Student
-          </Button>
+          <Link href="/students/new">
+            <Button
+              size="sm"
+              className="gap-2 text-xs font-bold bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white shadow-md shadow-emerald-600/20"
+            >
+              <PlusCircle className="h-4 w-4" />
+              Add Student (Process Wizard)
+            </Button>
+          </Link>
         </div>
       </div>
 
@@ -199,3 +204,4 @@ export default function StudentsPage() {
     </div>
   );
 }
+

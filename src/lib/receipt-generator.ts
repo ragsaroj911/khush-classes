@@ -15,11 +15,11 @@ export function generateReceiptPdf(
     format: 'a4',
   });
 
-  const instituteName = process.env.NEXT_PUBLIC_INSTITUTE_NAME || 'Apex International Institute';
-  const instituteAddress = process.env.NEXT_PUBLIC_INSTITUTE_ADDRESS || 'Sector 62, Knowledge Boulevard, Institutional Area';
-  const institutePhone = process.env.NEXT_PUBLIC_INSTITUTE_PHONE || '+91 120 4567 890';
-  const instituteEmail = process.env.NEXT_PUBLIC_INSTITUTE_EMAIL || 'fees@apex-institute.edu';
-  const currencySymbol = process.env.NEXT_PUBLIC_CURRENCY_SYMBOL || 'INR';
+  const instituteName = process.env.NEXT_PUBLIC_INSTITUTE_NAME || 'Khush Classes';
+  const instituteAddress = process.env.NEXT_PUBLIC_INSTITUTE_ADDRESS || 'Main Market Road, Knowledge Park, Delhi NCR';
+  const institutePhone = process.env.NEXT_PUBLIC_INSTITUTE_PHONE || '+91 98765 43210';
+  const instituteEmail = process.env.NEXT_PUBLIC_INSTITUTE_EMAIL || 'fees@khushclasses.com';
+  const currencySymbol = 'Rs.';
 
   // Header background banner
   doc.setFillColor(15, 23, 42); // slate-900
@@ -174,3 +174,4 @@ export function generateReceiptPdf(
   // Save the PDF
   doc.save(`${payment.receipt_number}_${student.roll_number}.pdf`);
 }
+

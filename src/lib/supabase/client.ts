@@ -18,3 +18,4 @@ export function getBrowserSupabase() {
   if (!isSupabaseConfigured) return null;
   return createSupabaseClient(supabaseUrl, supabaseAnonKey);
 }
+

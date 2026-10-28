@@ -143,11 +143,11 @@ export function RecordPaymentModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={recordedSuccess ? 'Payment Successful' : 'Record Fee Payment'}
+      title={recordedSuccess ? 'Fee Payment Receipt Generated (₹)' : 'Record Fee Collection (₹) — Khush Classes'}
       description={
         recordedSuccess
-          ? `Receipt ${recordedSuccess.payment.receipt_number} generated.`
-          : 'Record tuition and academic fee collection with automatic balance adjustment.'
+          ? `Receipt ${recordedSuccess.payment.receipt_number} issued for Khush Classes.`
+          : 'Record tuition fee installment in Indian Rupees (₹) with real-time balance adjustment.'
       }
       maxWidth="lg"
     >
@@ -353,3 +353,4 @@ export function RecordPaymentModal({
     </Modal>
   );
 }
+

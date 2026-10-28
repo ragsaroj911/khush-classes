@@ -17,10 +17,10 @@ export default function ReceiptPrintPage() {
   const [payment, setPayment] = React.useState<Payment | null>(null);
   const [loading, setLoading] = React.useState(true);
 
-  const instituteName = process.env.NEXT_PUBLIC_INSTITUTE_NAME || 'Apex International Institute';
-  const instituteAddress = process.env.NEXT_PUBLIC_INSTITUTE_ADDRESS || 'Sector 62, Knowledge Boulevard, Institutional Area';
-  const institutePhone = process.env.NEXT_PUBLIC_INSTITUTE_PHONE || '+91 120 4567 890';
-  const instituteEmail = process.env.NEXT_PUBLIC_INSTITUTE_EMAIL || 'fees@apex-institute.edu';
+  const instituteName = process.env.NEXT_PUBLIC_INSTITUTE_NAME || 'Khush Classes';
+  const instituteAddress = process.env.NEXT_PUBLIC_INSTITUTE_ADDRESS || 'Main Market Road, Knowledge Park, Delhi NCR';
+  const institutePhone = process.env.NEXT_PUBLIC_INSTITUTE_PHONE || '+91 98765 43210';
+  const instituteEmail = process.env.NEXT_PUBLIC_INSTITUTE_EMAIL || 'fees@khushclasses.com';
 
   React.useEffect(() => {
     async function loadPayment() {
@@ -250,3 +250,4 @@ export default function ReceiptPrintPage() {
     </div>
   );
 }
+

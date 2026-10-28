@@ -3,9 +3,9 @@ import './globals.css';
 import { AppShell } from '@/components/layout/AppShell';
 
 export const metadata: Metadata = {
-  title: 'Student Fee Management System | Official Institution Console',
+  title: 'Khush Classes | Student Fee Management System',
   description:
-    'Modern, minimalist, responsive Student Fee Management System with Supabase, Resend, and Next.js.',
+    'Modern, minimalist, responsive Student Fee Management System for Khush Classes with Supabase, Resend, and Next.js.',
 };
 
 export default function RootLayout({
@@ -21,3 +21,4 @@ export default function RootLayout({
     </html>
   );
 }
+

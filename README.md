@@ -230,3 +230,4 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 - **Environment Isolation**: Private API keys (`SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`) are kept on the server and never exposed to the client.
 - **Accurate Calculations**: Balances and statuses are strictly calculated and clamped against negative numbers (`Math.max(net_fee - paid, 0)`).
 - **Client-Side PDF Generation**: Does not require heavy serverless headless chromium instances, ensuring zero memory timeouts and 100% reliable receipt downloads.
+

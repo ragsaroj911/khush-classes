@@ -107,3 +107,4 @@ export interface DashboardMetrics {
   recentPayments: Payment[];
   urgentDueStudents: Student[];
 }
+
