@@ -1,0 +1,201 @@
+'use client';
+
+import * as React from 'react';
+import { StudentTable } from '@/components/students/StudentTable';
+import { StudentDetailModal } from '@/components/students/StudentDetailModal';
+import { StudentFormModal } from '@/components/students/StudentFormModal';
+import { RecordPaymentModal } from '@/components/payments/RecordPaymentModal';
+import { SendReminderModal } from '@/components/reminders/SendReminderModal';
+import { Button } from '@/components/ui/button';
+import { PlusCircle, Download } from 'lucide-react';
+import { Student, Course, Batch } from '@/types';
+import { DataService } from '@/lib/storage';
+
+export default function StudentsPage() {
+  const [students, setStudents] = React.useState<Student[]>([]);
+  const [courses, setCourses] = React.useState<Course[]>([]);
+  const [batches, setBatches] = React.useState<Batch[]>([]);
+  const [loading, setLoading] = React.useState(true);
+
+  // Modals state
+  const [selectedStudentForDetail, setSelectedStudentForDetail] =
+    React.useState<Student | null>(null);
+  const [studentToEdit, setStudentToEdit] = React.useState<Student | null>(null);
+  const [isFormOpen, setIsFormOpen] = React.useState(false);
+  const [studentForPayment, setStudentForPayment] = React.useState<Student | null>(null);
+  const [isPaymentOpen, setIsPaymentOpen] = React.useState(false);
+  const [studentForReminder, setStudentForReminder] = React.useState<Student | null>(null);
+  const [isReminderOpen, setIsReminderOpen] = React.useState(false);
+
+  const loadData = React.useCallback(async () => {
+    try {
+      const s = await DataService.getStudents();
+      const c = await DataService.getCourses();
+      const b = await DataService.getBatches();
+      setStudents(s);
+      setCourses(c);
+      setBatches(b);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  React.useEffect(() => {
+    loadData();
+    const handleUpdate = () => loadData();
+    window.addEventListener('sfms_data_updated', handleUpdate);
+    return () => window.removeEventListener('sfms_data_updated', handleUpdate);
+  }, [loadData]);
+
+  const handleExportStudentsCsv = () => {
+    if (students.length === 0) return;
+    const headers = [
+      'Roll Number',
+      'First Name',
+      'Last Name',
+      'Email',
+      'Phone',
+      'Course',
+      'Batch',
+      'Net Fee',
+      'Paid Amount',
+      'Balance',
+      'Status',
+      'Due Date',
+    ];
+
+    const rows = students.map((s) => [
+      s.roll_number,
+      `"${s.first_name}"`,
+      `"${s.last_name}"`,
+      s.email,
+      s.phone,
+      `"${s.course?.code || ''}"`,
+      `"${s.batch?.name || ''}"`,
+      s.net_fee,
+      s.paid_amount,
+      s.balance_amount,
+      s.payment_status,
+      s.due_date || '',
+    ]);
+
+    const csvContent =
+      'data:text/csv;charset=utf-8,' +
+      [headers.join(','), ...rows.map((e) => e.join(','))].join('\n');
+
+    const link = document.createElement('a');
+    link.href = encodeURI(csvContent);
+    link.download = `students_fee_roster_${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Top Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+            Student Fee Registry
+          </h1>
+          <p className="text-sm text-slate-500 mt-1">
+            Search, manage student profiles, monitor ledger balances, and record payments.
+          </p>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleExportStudentsCsv}
+            className="gap-2 text-xs"
+          >
+            <Download className="h-3.5 w-3.5" />
+            Export Roster
+          </Button>
+
+          <Button
+            size="sm"
+            className="gap-2 text-xs bg-slate-900 text-white"
+            onClick={() => {
+              setStudentToEdit(null);
+              setIsFormOpen(true);
+            }}
+          >
+            <PlusCircle className="h-3.5 w-3.5" />
+            Register Student
+          </Button>
+        </div>
+      </div>
+
+      {loading ? (
+        <div className="py-20 text-center text-slate-400 text-xs">Loading students roster...</div>
+      ) : (
+        <StudentTable
+          students={students}
+          courses={courses}
+          batches={batches}
+          onSelectStudent={(s) => setSelectedStudentForDetail(s)}
+          onRecordPayment={(s) => {
+            setStudentForPayment(s);
+            setIsPaymentOpen(true);
+          }}
+          onSendReminder={(s) => {
+            setStudentForReminder(s);
+            setIsReminderOpen(true);
+          }}
+          onEditStudent={(s) => {
+            setStudentToEdit(s);
+            setIsFormOpen(true);
+          }}
+        />
+      )}
+
+      {/* Modals */}
+      <StudentDetailModal
+        student={selectedStudentForDetail}
+        isOpen={Boolean(selectedStudentForDetail)}
+        onClose={() => setSelectedStudentForDetail(null)}
+        onRecordPaymentClick={(s) => {
+          setStudentForPayment(s);
+          setIsPaymentOpen(true);
+        }}
+        onSendReminderClick={(s) => {
+          setStudentForReminder(s);
+          setIsReminderOpen(true);
+        }}
+      />
+
+      <StudentFormModal
+        isOpen={isFormOpen}
+        onClose={() => {
+          setIsFormOpen(false);
+          setStudentToEdit(null);
+        }}
+        editStudent={studentToEdit}
+        onStudentSaved={() => loadData()}
+      />
+
+      <RecordPaymentModal
+        isOpen={isPaymentOpen}
+        onClose={() => {
+          setIsPaymentOpen(false);
+          setStudentForPayment(null);
+        }}
+        preSelectedStudent={studentForPayment}
+        onPaymentRecorded={() => loadData()}
+      />
+
+      <SendReminderModal
+        student={studentForReminder}
+        isOpen={isReminderOpen}
+        onClose={() => {
+          setIsReminderOpen(false);
+          setStudentForReminder(null);
+        }}
+        onReminderSent={() => loadData()}
+      />
+    </div>
+  );
+}
