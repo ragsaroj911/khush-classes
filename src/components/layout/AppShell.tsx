@@ -26,7 +26,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const [isStudentOpen, setIsStudentOpen] = React.useState(false);
   const [showConfigNotice, setShowConfigNotice] = React.useState(true);
 
-  const isDemoMode = !isSupabaseConfigured || !isResendConfigured;
+  const isDemoMode = !isSupabaseConfigured;
   const isHomePage = pathname === '/';
 
   // Smart back navigation: goes back in history, or pushes to '/' if at top level or history ends

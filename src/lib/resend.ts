@@ -3,7 +3,8 @@ import { formatCurrency, formatDate, getPaymentMethodLabel } from './utils';
 
 const resendApiKey = process.env.RESEND_API_KEY || '';
 export const isResendConfigured = Boolean(
-  resendApiKey && !resendApiKey.includes('your_resend')
+  (resendApiKey && !resendApiKey.includes('your_resend')) ||
+  process.env.NEXT_PUBLIC_RESEND_CONFIGURED === 'true'
 );
 
 export const resendClient = isResendConfigured ? new Resend(resendApiKey) : null;
