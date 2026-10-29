@@ -111,11 +111,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   React.useEffect(() => {
     if (loading) return;
 
-    const isLoginPage = pathname === '/login';
+    const isAuthPage = pathname === '/login' || pathname === '/logout';
 
-    if (!user && !isLoginPage) {
+    if (!user && !isAuthPage) {
       router.push(`/login?redirect=${encodeURIComponent(pathname)}`);
-    } else if (user && isLoginPage) {
+    } else if (user && pathname === '/login') {
       router.push('/');
     }
   }, [user, loading, pathname, router]);

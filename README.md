@@ -60,7 +60,7 @@ Designed specifically for **Khush Classes** to streamline student admissions, cu
 - Monthly collection bar chart and payment channel distribution (UPI vs Cash vs Card vs Bank).
 - One-click **Export to CSV** for spreadsheets and accounting audits.
 
-### 6. 🔐 Supabase Authentication & Role-Based Access Control (RBAC)
+### 6. 🔐 Supabase Authentication, Staff Logins & Logout
 - **Protected Portal Access:** Without logging in, users cannot access any dashboard or institutional records; requests automatically redirect to `/login`.
 - **Primary Administrator Account:**
   - **Login Email:** `khushmain8777@gmail.com`
@@ -70,7 +70,10 @@ Designed specifically for **Khush Classes** to streamline student admissions, cu
   - The Primary Administrator has exclusive access to the **"Staff & Logins"** console.
   - Create new authorized staff, cashier, or additional administrator accounts directly in Supabase Auth via `/api/admin/users`.
   - Assign roles: `Staff / Cashier` (admissions, ledger, payments, receipts) vs `Administrator` (full system access + user management).
-  - Secure sign-out with instant session revocation.
+- **Dedicated Logout Console (`/logout`) & Quick Session Controls:**
+  - Dedicated sign-out confirmation page at `/logout`.
+  - 1-click **Sign Out / Log Out** button directly in the Home Page header, welcome banner, desktop sidebar, and mobile navigation.
+  - Instant session token revocation and secure redirect.
 
 ---
 

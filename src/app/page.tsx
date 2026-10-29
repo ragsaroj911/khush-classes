@@ -11,6 +11,7 @@ import { StudentDetailModal } from '@/components/students/StudentDetailModal';
 import { SendReminderModal } from '@/components/reminders/SendReminderModal';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/lib/auth-context';
 import {
   Users,
   CreditCard,
@@ -25,9 +26,13 @@ import {
   CheckCircle2,
   Clock,
   Sparkles,
+  LogOut,
+  ShieldCheck,
+  UserCheck,
 } from 'lucide-react';
 
 export default function DashboardPage() {
+  const { user, isAdmin, logout } = useAuth();
   const [metrics, setMetrics] = React.useState<DashboardMetrics | null>(null);
   const [loading, setLoading] = React.useState(true);
 
@@ -110,6 +115,61 @@ export default function DashboardPage() {
           </Button>
         </div>
       </div>
+
+      {/* Active User Session & Logout Action Banner on Home Page */}
+      {user && (
+        <div className="flex flex-col md:flex-row md:items-center justify-between p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 text-white shadow-md border border-slate-700/60 gap-3">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0">
+              <ShieldCheck className="h-5 w-5" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-bold text-white">
+                  {user.full_name || 'Khush Administrator'}
+                </span>
+                <span
+                  className={`text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full border ${
+                    isAdmin
+                      ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
+                      : 'bg-blue-500/20 text-blue-300 border-blue-500/30'
+                  }`}
+                >
+                  {isAdmin ? 'ADMINISTRATOR' : 'STAFF'}
+                </span>
+              </div>
+              <p className="text-xs text-slate-400 font-mono mt-0.5">
+                Logged in as <span className="text-slate-200 font-medium">{user.email}</span>
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 self-end md:self-auto">
+            {isAdmin && (
+              <Link href="/users">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-8 text-xs font-semibold bg-white/10 hover:bg-white/20 text-white border-white/20"
+                >
+                  <UserCheck className="h-3.5 w-3.5 mr-1 text-emerald-400" />
+                  Manage Logins
+                </Button>
+              </Link>
+            )}
+
+            <Link href="/logout">
+              <Button
+                size="sm"
+                className="h-8 text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white shadow-sm shadow-rose-600/30 gap-1.5"
+              >
+                <LogOut className="h-3.5 w-3.5" />
+                Sign Out / Log Out
+              </Button>
+            </Link>
+          </div>
+        </div>
+      )}
 
       {/* KPI Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

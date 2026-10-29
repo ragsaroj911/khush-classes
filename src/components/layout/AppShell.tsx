@@ -13,6 +13,7 @@ import {
   Home,
   ShieldCheck,
   UserCheck,
+  LogOut,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AuthProvider, useAuth } from '@/lib/auth-context';
@@ -26,7 +27,7 @@ function AppShellInner({ children }: { children: React.ReactNode }) {
   const [isStudentOpen, setIsStudentOpen] = React.useState(false);
 
   const isHomePage = pathname === '/';
-  const isLoginPage = pathname === '/login';
+  const isAuthPage = pathname === '/login' || pathname === '/logout';
 
   // Smart back navigation: goes back in history, or pushes to '/' if at top level or history ends
   const handleHugeBack = () => {
@@ -39,8 +40,8 @@ function AppShellInner({ children }: { children: React.ReactNode }) {
     }
   };
 
-  // 1. If currently on login page, render clean standalone view without sidebar or headers
-  if (isLoginPage) {
+  // 1. If currently on login or logout page, render clean standalone view without sidebar or headers
+  if (isAuthPage) {
     return <main className="min-h-screen">{children}</main>;
   }
 
@@ -154,9 +155,21 @@ function AppShellInner({ children }: { children: React.ReactNode }) {
                 </span>
               </button>
             ) : (
-              <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs uppercase tracking-wider border border-slate-200 dark:border-slate-700">
-                <Home className="h-4 w-4 text-emerald-600" />
-                <span>Khush Classes Home</span>
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-xs uppercase tracking-wider border border-slate-200 dark:border-slate-700">
+                  <Home className="h-4 w-4 text-emerald-600" />
+                  <span>Home</span>
+                </div>
+                <Link href="/logout">
+                  <button
+                    type="button"
+                    title="Sign Out / Log Out"
+                    className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 dark:bg-rose-950/40 dark:hover:bg-rose-900/50 dark:text-rose-300 border border-rose-200 dark:border-rose-800 font-bold text-xs tracking-wide shadow-sm hover:scale-105 active:scale-95 transition-all"
+                  >
+                    <LogOut className="h-3.5 w-3.5 text-rose-600" />
+                    <span>Log Out</span>
+                  </button>
+                </Link>
               </div>
             )}
           </div>

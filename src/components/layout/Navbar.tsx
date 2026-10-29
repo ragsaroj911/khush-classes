@@ -214,7 +214,7 @@ export function MobileNavbar({
       </Link>
 
       <div className="flex items-center gap-2">
-        {!isHome && onBack && (
+        {!isHome && onBack ? (
           <button
             onClick={onBack}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-rose-600 to-amber-600 text-white font-black text-xs uppercase tracking-wider shadow-md hover:scale-105 active:scale-95 transition-all"
@@ -222,6 +222,14 @@ export function MobileNavbar({
           >
             ← BACK
           </button>
+        ) : (
+          <Link
+            href="/logout"
+            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300 font-bold text-xs border border-rose-200 dark:border-rose-800"
+          >
+            <LogOut className="h-3.5 w-3.5" />
+            Logout
+          </Link>
         )}
 
         <button
