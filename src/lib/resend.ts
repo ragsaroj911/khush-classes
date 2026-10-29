@@ -7,7 +7,11 @@ export const isResendConfigured = Boolean(
   process.env.NEXT_PUBLIC_RESEND_CONFIGURED === 'true'
 );
 
-export const resendClient = isResendConfigured ? new Resend(resendApiKey) : null;
+// Only instantiate Resend server-side when an actual API key is present
+export const resendClient =
+  typeof window === 'undefined' && resendApiKey && !resendApiKey.includes('your_resend')
+    ? new Resend(resendApiKey)
+    : null;
 
 const defaultFrom = process.env.RESEND_FROM_EMAIL || 'Khush Classes <onboarding@resend.dev>';
 const instituteName = process.env.NEXT_PUBLIC_INSTITUTE_NAME || 'Khush Classes';
