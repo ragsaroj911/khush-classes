@@ -19,6 +19,7 @@ Designed specifically for **Khush Classes** to streamline student admissions, cu
 - 🛠️ **Customizable Fee Structure (Non-Fixed Fees)**: Custom itemized fee heads builder per student (Tuition, Admission, Study Modules, Test Series, Bus/Transport, Hostel, or Custom Heads).
 - 🚀 **Eye-Catching Guided Admission Wizard**: 4-step interactive enrollment process at `/students/new` with instant roll number generation (`KC-2024-XXX`).
 - 🔙 **Persistent Top-Right Back Button**: One-click navigation returning step-by-step across all subpages until reaching the Home Dashboard.
+- 🔐 **Supabase Authentication & Staff Logins**: Complete login protection. Administrator (`khushmain8777@gmail.com`) can issue new user logins and passwords directly.
 - ⚡ **Dual-Engine Data Layer**: Connects to live **Supabase PostgreSQL** with automated fallback to local storage for zero-downtime testing.
 - 📄 **Vector PDF Receipts & Printable Vouchers**: Instant client-side PDF generation (`jspdf`) + print-ready official vouchers (`/receipt/[id]`).
 - ✉️ **Resend Transactional Emails**: Automated payment confirmations and overdue fee reminders with HTML styling.
@@ -58,6 +59,18 @@ Designed specifically for **Khush Classes** to streamline student admissions, cu
 - Executive KPI summary cards: Total Billed, Total Collected, Total Outstanding, Collection Efficiency Ratio.
 - Monthly collection bar chart and payment channel distribution (UPI vs Cash vs Card vs Bank).
 - One-click **Export to CSV** for spreadsheets and accounting audits.
+
+### 6. 🔐 Supabase Authentication & Role-Based Access Control (RBAC)
+- **Protected Portal Access:** Without logging in, users cannot access any dashboard or institutional records; requests automatically redirect to `/login`.
+- **Primary Administrator Account:**
+  - **Login Email:** `khushmain8777@gmail.com`
+  - **Password:** `Vikram@3000`
+  - Pre-configured in Supabase Authentication with full administrative privileges.
+- **Admin-Only User Management (`/users`)**:
+  - The Primary Administrator has exclusive access to the **"Staff & Logins"** console.
+  - Create new authorized staff, cashier, or additional administrator accounts directly in Supabase Auth via `/api/admin/users`.
+  - Assign roles: `Staff / Cashier` (admissions, ledger, payments, receipts) vs `Administrator` (full system access + user management).
+  - Secure sign-out with instant session revocation.
 
 ---
 

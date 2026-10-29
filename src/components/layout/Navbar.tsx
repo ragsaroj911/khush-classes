@@ -17,12 +17,16 @@ import {
   Sparkles,
   Database,
   Send,
+  UserCheck,
+  LogOut,
+  ShieldCheck,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { isSupabaseConfigured } from '@/lib/supabase/client';
 import { isResendConfigured } from '@/lib/resend';
+import { useAuth } from '@/lib/auth-context';
 
-const NAV_ITEMS = [
+const BASE_NAV_ITEMS = [
   { href: '/', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/students', label: 'Students', icon: Users },
   { href: '/courses', label: 'Courses & Batches', icon: BookOpen },
@@ -34,7 +38,18 @@ const NAV_ITEMS = [
 
 export function Sidebar({ className }: { className?: string }) {
   const pathname = usePathname();
+  const { user, isAdmin, logout } = useAuth();
   const instituteName = process.env.NEXT_PUBLIC_INSTITUTE_NAME || 'Khush Classes';
+
+  const navItems = React.useMemo(() => {
+    if (isAdmin) {
+      return [
+        ...BASE_NAV_ITEMS,
+        { href: '/users', label: 'Staff & Logins', icon: UserCheck, badge: 'Admin' },
+      ];
+    }
+    return BASE_NAV_ITEMS;
+  }, [isAdmin]);
 
   return (
     <aside
@@ -61,7 +76,7 @@ export function Sidebar({ className }: { className?: string }) {
 
         {/* Navigation links */}
         <nav className="space-y-1">
-          {NAV_ITEMS.map((item) => {
+          {navItems.map((item) => {
             const isActive = pathname === item.href;
             const Icon = item.icon;
             return (
@@ -88,7 +103,9 @@ export function Sidebar({ className }: { className?: string }) {
                   <span
                     className={cn(
                       'text-[10px] font-semibold px-1.5 py-0.5 rounded-full',
-                      isActive
+                      item.badge === 'Admin'
+                        ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
+                        : isActive
                         ? 'bg-white/20 text-white dark:bg-slate-900/20 dark:text-slate-900'
                         : 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-400'
                     )}
@@ -102,44 +119,53 @@ export function Sidebar({ className }: { className?: string }) {
         </nav>
       </div>
 
-      {/* System Status / Cloud Integrations Card */}
+      {/* User Session & Status Card */}
       <div className="space-y-3 pt-4 border-t border-slate-100 dark:border-slate-800">
-        <div className="rounded-xl bg-slate-50 dark:bg-slate-900/60 p-3.5 border border-slate-100 dark:border-slate-800">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
-              Integrations
-            </span>
-            <Sparkles className="h-3 w-3 text-amber-500" />
-          </div>
+        {user && (
+          <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1">
+                <ShieldCheck className="h-3 w-3 text-emerald-500" />
+                Active Session
+              </span>
+              <span
+                className={`text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded ${
+                  isAdmin
+                    ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
+                    : 'bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300'
+                }`}
+              >
+                {isAdmin ? 'ADMIN' : 'STAFF'}
+              </span>
+            </div>
 
-          <div className="space-y-1.5 text-xs">
-            <div className="flex items-center justify-between">
-              <span className="flex items-center gap-1.5 text-slate-600 dark:text-slate-300">
-                <Database className="h-3 w-3 text-slate-400" />
-                Supabase
-              </span>
-              <span
-                className={cn(
-                  'h-2 w-2 rounded-full',
-                  isSupabaseConfigured ? 'bg-emerald-500 ring-2 ring-emerald-200' : 'bg-amber-400'
-                )}
-                title={isSupabaseConfigured ? 'Connected to live Supabase DB' : 'Using Local Demo DB'}
-              />
+            <div className="text-xs">
+              <p className="font-bold text-slate-900 dark:text-white truncate">
+                {user.full_name || 'Khush Admin'}
+              </p>
+              <p className="text-[11px] text-slate-500 truncate font-mono mt-0.5">
+                {user.email}
+              </p>
             </div>
-            <div className="flex items-center justify-between">
-              <span className="flex items-center gap-1.5 text-slate-600 dark:text-slate-300">
-                <Send className="h-3 w-3 text-slate-400" />
-                Resend
-              </span>
-              <span
-                className={cn(
-                  'h-2 w-2 rounded-full',
-                  isResendConfigured ? 'bg-emerald-500 ring-2 ring-emerald-200' : 'bg-amber-400'
-                )}
-                title={isResendConfigured ? 'Resend Live Email Active' : 'Email Simulation Active'}
-              />
-            </div>
+
+            <button
+              type="button"
+              onClick={() => logout()}
+              className="w-full flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-xs font-semibold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors"
+            >
+              <LogOut className="h-3.5 w-3.5" />
+              Sign Out
+            </button>
           </div>
+        )}
+
+        {/* Integration Status Indicators */}
+        <div className="rounded-xl bg-slate-50 dark:bg-slate-900/40 p-2.5 border border-slate-100 dark:border-slate-800/80 text-[11px] text-slate-500 flex items-center justify-between">
+          <span className="flex items-center gap-1.5">
+            <Database className="h-3 w-3 text-emerald-600" />
+            Supabase DB
+          </span>
+          <span className="h-2 w-2 rounded-full bg-emerald-500 ring-2 ring-emerald-200" title="Connected" />
         </div>
       </div>
     </aside>
@@ -155,7 +181,18 @@ export function MobileNavbar({
 }) {
   const [isOpen, setIsOpen] = React.useState(false);
   const pathname = usePathname();
+  const { user, isAdmin, logout } = useAuth();
   const instituteName = process.env.NEXT_PUBLIC_INSTITUTE_NAME || 'Khush Classes';
+
+  const navItems = React.useMemo(() => {
+    if (isAdmin) {
+      return [
+        ...BASE_NAV_ITEMS,
+        { href: '/users', label: 'Staff & Logins', icon: UserCheck, badge: 'Admin' },
+      ];
+    }
+    return BASE_NAV_ITEMS;
+  }, [isAdmin]);
 
   React.useEffect(() => {
     setIsOpen(false);
@@ -200,7 +237,7 @@ export function MobileNavbar({
       {isOpen && (
         <div className="fixed inset-0 top-[53px] z-50 bg-white dark:bg-slate-950 p-6 flex flex-col justify-between overflow-y-auto">
           <nav className="space-y-2">
-            {NAV_ITEMS.map((item) => {
+            {navItems.map((item) => {
               const isActive = pathname === item.href;
               const Icon = item.icon;
               return (
@@ -219,7 +256,14 @@ export function MobileNavbar({
                     <span>{item.label}</span>
                   </div>
                   {item.badge && (
-                    <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-rose-100 text-rose-700">
+                    <span
+                      className={cn(
+                        'text-xs font-semibold px-2 py-0.5 rounded-full',
+                        item.badge === 'Admin'
+                          ? 'bg-emerald-100 text-emerald-800'
+                          : 'bg-rose-100 text-rose-700'
+                      )}
+                    >
                       {item.badge}
                     </span>
                   )}
@@ -227,9 +271,29 @@ export function MobileNavbar({
               );
             })}
           </nav>
+
+          {user && (
+            <div className="pt-6 border-t border-slate-200 dark:border-slate-800 space-y-3">
+              <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 text-xs">
+                <span className="text-[10px] uppercase font-bold text-emerald-600 block mb-0.5">
+                  Signed in as {isAdmin ? 'Administrator' : 'Staff'}
+                </span>
+                <p className="font-bold text-slate-900 dark:text-white">{user.full_name}</p>
+                <p className="font-mono text-slate-500">{user.email}</p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => logout()}
+                className="w-full py-2.5 rounded-xl bg-rose-50 text-rose-700 font-bold text-sm flex items-center justify-center gap-2"
+              >
+                <LogOut className="h-4 w-4" />
+                Sign Out
+              </button>
+            </div>
+          )}
         </div>
       )}
     </header>
   );
 }
-

@@ -9,37 +9,63 @@ import { StudentFormModal } from '@/components/students/StudentFormModal';
 import {
   PlusCircle,
   Receipt,
-  AlertTriangle,
   ArrowLeft,
   Home,
-  GraduationCap,
+  ShieldCheck,
+  UserCheck,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { isSupabaseConfigured } from '@/lib/supabase/client';
-import { isResendConfigured } from '@/lib/resend';
+import { AuthProvider, useAuth } from '@/lib/auth-context';
 
-export function AppShell({ children }: { children: React.ReactNode }) {
+function AppShellInner({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
+  const { user, isAdmin, loading } = useAuth();
 
   const [isPaymentOpen, setIsPaymentOpen] = React.useState(false);
   const [isStudentOpen, setIsStudentOpen] = React.useState(false);
-  const [showConfigNotice, setShowConfigNotice] = React.useState(true);
 
-  const isDemoMode = !isSupabaseConfigured;
   const isHomePage = pathname === '/';
+  const isLoginPage = pathname === '/login';
 
   // Smart back navigation: goes back in history, or pushes to '/' if at top level or history ends
   const handleHugeBack = () => {
     if (isHomePage) return;
 
-    // If on a sub-route like /receipt/123 or /students/new, go back or to home
     if (typeof window !== 'undefined' && window.history.length > 2) {
       window.history.back();
     } else {
       router.push('/');
     }
   };
+
+  // 1. If currently on login page, render clean standalone view without sidebar or headers
+  if (isLoginPage) {
+    return <main className="min-h-screen">{children}</main>;
+  }
+
+  // 2. Loading state while verifying credentials
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center p-4 text-white">
+        <div className="flex flex-col items-center gap-3">
+          <div className="h-10 w-10 animate-spin rounded-full border-3 border-emerald-500 border-t-transparent" />
+          <p className="text-xs font-semibold text-slate-400 tracking-wide uppercase">
+            Verifying Khush Classes Portal Access...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // 3. If unauthenticated, AuthProvider will redirect; render blank screen in the interim
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center text-xs text-slate-500">
+        Redirecting to Authorized Sign In...
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-50/60 dark:bg-slate-950 flex flex-col lg:flex-row">
@@ -61,6 +87,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <span className="text-xs font-bold text-slate-400">
                 Khush Classes
               </span>
+              <span
+                className={`text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full border ${
+                  isAdmin
+                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                    : 'bg-blue-50 text-blue-700 border-blue-200'
+                }`}
+              >
+                {isAdmin ? 'ADMIN AUTH' : 'STAFF AUTH'}
+              </span>
             </div>
             <p className="text-sm font-bold text-slate-900 dark:text-slate-100 mt-0.5">
               Student Fee Management & Billing Console
@@ -68,6 +103,20 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
 
           <div className="flex items-center gap-3.5">
+            {/* Admin Quick Action: Manage Staff */}
+            {isAdmin && (
+              <Link href="/users">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-2 text-xs font-semibold h-9 text-emerald-700 border-emerald-200 hover:bg-emerald-50 dark:border-emerald-800 dark:text-emerald-300"
+                >
+                  <UserCheck className="h-3.5 w-3.5" />
+                  Manage Logins
+                </Button>
+              </Link>
+            )}
+
             {/* Quick Action: Register Student */}
             <Button
               variant="outline"
@@ -113,24 +162,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
         </header>
 
-        {/* Demo Mode / Environment Notice Banner (Dismissible) */}
-        {isDemoMode && showConfigNotice && (
-          <div className="bg-amber-50 dark:bg-amber-950/40 border-b border-amber-200 dark:border-amber-900/50 px-4 sm:px-8 py-2 text-xs text-amber-900 dark:text-amber-200 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <AlertTriangle className="h-4 w-4 text-amber-600 shrink-0" />
-              <span>
-                <strong>Khush Classes Local Mode:</strong> All fees are in Indian Rupees (₹). Connect live Supabase & Resend via <code className="bg-amber-100 dark:bg-amber-900/60 px-1.5 py-0.5 rounded font-mono text-[11px]">.env.local</code>.
-              </span>
-            </div>
-            <button
-              onClick={() => setShowConfigNotice(false)}
-              className="text-amber-700 hover:text-amber-950 font-bold underline ml-4 text-[11px]"
-            >
-              Dismiss
-            </button>
-          </div>
-        )}
-
         {/* Main Body */}
         <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full">
           {children}
@@ -160,5 +191,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         }}
       />
     </div>
+  );
+}
+
+export function AppShell({ children }: { children: React.ReactNode }) {
+  return (
+    <AuthProvider>
+      <AppShellInner>{children}</AppShellInner>
+    </AuthProvider>
   );
 }

@@ -1,6 +1,15 @@
 export type PaymentStatus = 'paid' | 'partial' | 'pending' | 'overdue';
 export type PaymentMethod = 'upi' | 'cash' | 'card' | 'bank_transfer' | 'cheque';
 export type StudentStatus = 'active' | 'graduated' | 'suspended';
+export type UserRole = 'admin' | 'staff';
+
+export interface AuthUser {
+  id: string;
+  email: string;
+  full_name?: string;
+  role: UserRole;
+  created_at?: string;
+}
 
 export interface Course {
   id: string;
