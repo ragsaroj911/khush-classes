@@ -23,7 +23,6 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { isSupabaseConfigured } from '@/lib/supabase/client';
-import { isResendConfigured } from '@/lib/resend';
 import { useAuth } from '@/lib/auth-context';
 
 const BASE_NAV_ITEMS = [

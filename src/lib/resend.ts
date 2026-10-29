@@ -7,11 +7,20 @@ export const isResendConfigured = Boolean(
   process.env.NEXT_PUBLIC_RESEND_CONFIGURED === 'true'
 );
 
-// Only instantiate Resend server-side when an actual API key is present
-export const resendClient =
-  typeof window === 'undefined' && resendApiKey && !resendApiKey.includes('your_resend')
-    ? new Resend(resendApiKey)
-    : null;
+// Safe helper to obtain Resend client strictly on server-side with a valid key
+export function getResendClient(): Resend | null {
+  if (typeof window !== 'undefined') return null;
+  const key = process.env.RESEND_API_KEY;
+  if (!key || !key.trim() || key.includes('your_resend')) {
+    return null;
+  }
+  try {
+    return new Resend(key.trim());
+  } catch (err) {
+    console.error('Failed to initialize Resend client:', err);
+    return null;
+  }
+}
 
 const defaultFrom = process.env.RESEND_FROM_EMAIL || 'Khush Classes <onboarding@resend.dev>';
 const instituteName = process.env.NEXT_PUBLIC_INSTITUTE_NAME || 'Khush Classes';
@@ -116,13 +125,14 @@ export async function sendFeeDueReminder(params: SendReminderParams): Promise<{ 
     </html>
   `;
 
-  if (!isResendConfigured || !resendClient) {
+  const client = getResendClient();
+  if (!client) {
     console.info(`[Resend Mock Mode] Simulated fee reminder email sent to: ${toEmail} for ${formatCurrency(amountDue)}`);
     return { success: true, id: `mock-${Date.now()}` };
   }
 
   try {
-    const { data, error } = await resendClient.emails.send({
+    const { data, error } = await client.emails.send({
       from: defaultFrom,
       to: toEmail,
       subject: `Urgent: Pending Fee Due Reminder (${rollNumber}) - ${instituteName}`,
@@ -228,13 +238,14 @@ export async function sendPaymentReceiptEmail(params: SendReceiptParams): Promis
     </html>
   `;
 
-  if (!isResendConfigured || !resendClient) {
+  const client = getResendClient();
+  if (!client) {
     console.info(`[Resend Mock Mode] Simulated payment receipt email sent to: ${toEmail} for ${formatCurrency(amountPaid)}`);
     return { success: true, id: `mock-${Date.now()}` };
   }
 
   try {
-    const { data, error } = await resendClient.emails.send({
+    const { data, error } = await client.emails.send({
       from: defaultFrom,
       to: toEmail,
       subject: `Payment Receipt ${receiptNumber} - ${instituteName}`,
