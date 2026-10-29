@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
-import { Course, Batch, Student } from '@/types';
+import { Course, Batch, Student, FeeItem } from '@/types';
 import { DataService } from '@/lib/storage';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
@@ -25,6 +25,10 @@ import {
   ShieldCheck,
   RefreshCw,
   Receipt,
+  Trash2,
+  Plus,
+  Sliders,
+  Calculator,
 } from 'lucide-react';
 
 interface StudentRegistrationWizardProps {
@@ -69,11 +73,23 @@ export function StudentRegistrationWizard({
   const [batchId, setBatchId] = React.useState('');
 
   // Step 3: Fee & Scholarship Details (in Indian Rupees ₹)
+  const [feeMode, setFeeMode] = React.useState<'package' | 'custom'>('package');
   const [grossFee, setGrossFee] = React.useState<number>(0);
   const [discountAmount, setDiscountAmount] = React.useState<number>(0);
   const [discountReason, setDiscountReason] = React.useState('');
   const [dueDate, setDueDate] = React.useState('');
   const [notes, setNotes] = React.useState('');
+
+  // Customizable Itemized Fee Heads
+  const [feeItems, setFeeItems] = React.useState<FeeItem[]>([
+    { id: '1', name: 'Coaching & Tuition Fee', amount: 65000, category: 'tuition' },
+    { id: '2', name: 'Admission & Registration Charges', amount: 15000, category: 'admission' },
+    { id: '3', name: 'Study Modules & Practice Sheets', amount: 10000, category: 'material' },
+    { id: '4', name: 'All-India Test Series & Mocks', amount: 10000, category: 'exam' },
+  ]);
+  const [newHeadName, setNewHeadName] = React.useState('');
+  const [newHeadAmount, setNewHeadAmount] = React.useState<number>(0);
+  const [isAddingHead, setIsAddingHead] = React.useState(false);
 
   // Success state
   const [createdStudent, setCreatedStudent] = React.useState<Student | null>(null);
@@ -107,11 +123,23 @@ export function StudentRegistrationWizard({
         setDiscountReason(editStudent.discount_reason || '');
         setDueDate(editStudent.due_date || '');
         setNotes(editStudent.notes || '');
+
+        if (editStudent.custom_fee_items && editStudent.custom_fee_items.length > 0) {
+          setFeeItems(editStudent.custom_fee_items);
+          setFeeMode('custom');
+        }
       } else {
         generateRoll();
         if (c.length > 0) {
           setCourseId(c[0].id);
-          setGrossFee(c[0].default_total_fee);
+          const defaultTotal = c[0].default_total_fee;
+          setGrossFee(defaultTotal);
+          setFeeItems([
+            { id: '1', name: 'Coaching & Tuition Fee', amount: Math.round(defaultTotal * 0.65), category: 'tuition' },
+            { id: '2', name: 'Admission & Registration Charges', amount: Math.round(defaultTotal * 0.15), category: 'admission' },
+            { id: '3', name: 'Study Modules & Practice Sheets', amount: Math.round(defaultTotal * 0.1), category: 'material' },
+            { id: '4', name: 'All-India Test Series & Mocks', amount: Math.round(defaultTotal * 0.1), category: 'exam' },
+          ]);
           const firstCourseBatches = b.filter((item) => item.course_id === c[0].id);
           if (firstCourseBatches.length > 0) {
             setBatchId(firstCourseBatches[0].id);
@@ -133,7 +161,14 @@ export function StudentRegistrationWizard({
     setCourseId(id);
     const crs = courses.find((c) => c.id === id);
     if (crs && !editStudent) {
-      setGrossFee(crs.default_total_fee);
+      const defaultTotal = crs.default_total_fee;
+      setGrossFee(defaultTotal);
+      setFeeItems([
+        { id: '1', name: 'Coaching & Tuition Fee', amount: Math.round(defaultTotal * 0.65), category: 'tuition' },
+        { id: '2', name: 'Admission & Registration Charges', amount: Math.round(defaultTotal * 0.15), category: 'admission' },
+        { id: '3', name: 'Study Modules & Practice Sheets', amount: Math.round(defaultTotal * 0.1), category: 'material' },
+        { id: '4', name: 'All-India Test Series & Mocks', amount: Math.round(defaultTotal * 0.1), category: 'exam' },
+      ]);
     }
     const matchBatches = batches.filter((b) => b.course_id === id);
     if (matchBatches.length > 0) {
@@ -143,7 +178,45 @@ export function StudentRegistrationWizard({
     }
   };
 
-  const netFee = Math.max((Number(grossFee) || 0) - (Number(discountAmount) || 0), 0);
+  const effectiveGrossFee =
+    feeMode === 'custom'
+      ? feeItems.reduce((acc, item) => acc + (Number(item.amount) || 0), 0)
+      : Number(grossFee) || 0;
+
+  const netFee = Math.max(effectiveGrossFee - (Number(discountAmount) || 0), 0);
+
+  const handleUpdateItemAmount = (id: string, amount: number) => {
+    setFeeItems((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, amount: Number(amount) || 0 } : item))
+    );
+  };
+
+  const handleUpdateItemName = (id: string, name: string) => {
+    setFeeItems((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, name } : item))
+    );
+  };
+
+  const handleRemoveItem = (id: string) => {
+    setFeeItems((prev) => prev.filter((item) => item.id !== id));
+  };
+
+  const handleAddCustomHead = () => {
+    if (!newHeadName.trim()) {
+      alert('Please enter a name for the custom fee head');
+      return;
+    }
+    const newItem: FeeItem = {
+      id: crypto.randomUUID(),
+      name: newHeadName.trim(),
+      amount: Number(newHeadAmount) || 0,
+      category: 'other',
+    };
+    setFeeItems((prev) => [...prev, newItem]);
+    setNewHeadName('');
+    setNewHeadAmount(0);
+    setIsAddingHead(false);
+  };
 
   const applyScholarship = (amount: number, reason: string) => {
     setDiscountAmount(amount);
@@ -172,7 +245,7 @@ export function StudentRegistrationWizard({
       }
     }
     if (currentStep === 3) {
-      if (grossFee < 0) {
+      if (effectiveGrossFee < 0) {
         alert('Course fee cannot be negative.');
         return;
       }
@@ -199,11 +272,12 @@ export function StudentRegistrationWizard({
           parent_email: parentEmail,
           course_id: courseId,
           batch_id: batchId,
-          gross_fee: Number(grossFee),
+          gross_fee: effectiveGrossFee,
           discount_amount: Number(discountAmount),
           discount_reason: discountReason,
           due_date: dueDate || undefined,
           notes,
+          custom_fee_items: feeMode === 'custom' ? feeItems : undefined,
         });
         if (updated) {
           setCreatedStudent(updated);
@@ -222,13 +296,14 @@ export function StudentRegistrationWizard({
           course_id: courseId,
           batch_id: batchId,
           admission_date: new Date().toISOString().split('T')[0],
-          gross_fee: Number(grossFee),
+          gross_fee: effectiveGrossFee,
           discount_amount: Number(discountAmount),
           discount_reason: discountReason,
           net_fee: netFee,
           due_date: dueDate || undefined,
           student_status: 'active',
           notes,
+          custom_fee_items: feeMode === 'custom' ? feeItems : undefined,
         });
         setCreatedStudent(created);
         if (onSuccess) onSuccess(created);
@@ -661,38 +736,191 @@ export function StudentRegistrationWizard({
           {/* STEP 3: Fee Breakdown & Scholarships (in Indian Rupees ₹) */}
           {currentStep === 3 && (
             <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 p-6 space-y-6 shadow-sm animate-in fade-in duration-150">
-              <div className="pb-3 border-b border-slate-100 dark:border-slate-800">
-                <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                  <IndianRupee className="h-4 w-4 text-emerald-600" />
-                  Fee Structure & Scholarship Assessment
-                </h3>
-                <p className="text-xs text-slate-500 mt-0.5">
-                  Configure tuition fees in Indian Rupees (₹) and apply official scholarship waivers.
-                </p>
+              <div className="pb-3 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                    <IndianRupee className="h-4 w-4 text-emerald-600" />
+                    Fee Structure & Scholarship Assessment
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Customize fee components item by item, or use standard course package fees.
+                  </p>
+                </div>
+
+                {/* Fee Mode Toggle */}
+                <div className="flex items-center gap-1.5 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl text-xs font-semibold">
+                  <button
+                    type="button"
+                    onClick={() => setFeeMode('package')}
+                    className={`py-1.5 px-3 rounded-lg transition-all ${
+                      feeMode === 'package'
+                        ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm font-bold'
+                        : 'text-slate-600 dark:text-slate-400'
+                    }`}
+                  >
+                    Package Fee
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFeeMode('custom')}
+                    className={`py-1.5 px-3 rounded-lg transition-all flex items-center gap-1.5 ${
+                      feeMode === 'custom'
+                        ? 'bg-emerald-600 text-white shadow-sm font-bold'
+                        : 'text-slate-600 dark:text-slate-400'
+                    }`}
+                  >
+                    <Sliders className="h-3 w-3" />
+                    Customize Fee Heads
+                  </button>
+                </div>
               </div>
 
-              {/* Base Fee Input */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Input
-                  label="Standard Course Base Fee (₹)"
-                  type="number"
-                  required
-                  min="0"
-                  step="100"
-                  value={grossFee}
-                  onChange={(e) => setGrossFee(Number(e.target.value))}
-                />
-                <Input
-                  label="Payment Due Date"
-                  type="date"
-                  required
-                  value={dueDate}
-                  onChange={(e) => setDueDate(e.target.value)}
-                />
-              </div>
+              {/* Mode 1: Standard Course Fee */}
+              {feeMode === 'package' ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <Input
+                    label="Standard Course Base Fee (₹)"
+                    type="number"
+                    required
+                    min="0"
+                    step="100"
+                    value={grossFee}
+                    onChange={(e) => setGrossFee(Number(e.target.value))}
+                    hint="Standard tuition fee package for selected course."
+                  />
+                  <Input
+                    label="Payment Due Date"
+                    type="date"
+                    required
+                    value={dueDate}
+                    onChange={(e) => setDueDate(e.target.value)}
+                  />
+                </div>
+              ) : (
+                /* Mode 2: Full Itemized Custom Fee Builder */
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 block">
+                        Customized Fee Components (₹)
+                      </span>
+                      <p className="text-[11px] text-slate-400">
+                        Edit each head amount, or add special custom fee items for this student.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setIsAddingHead(true)}
+                      className="text-xs font-bold text-emerald-600 hover:text-emerald-700 flex items-center gap-1 bg-emerald-50 dark:bg-emerald-950/60 px-3 py-1.5 rounded-lg border border-emerald-200"
+                    >
+                      <Plus className="h-3.5 w-3.5" />
+                      Add Custom Fee Head
+                    </button>
+                  </div>
+
+                  {/* Fee Items List */}
+                  <div className="space-y-2">
+                    {feeItems.map((item) => (
+                      <div
+                        key={item.id}
+                        className="flex items-center gap-2.5 p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/40"
+                      >
+                        <input
+                          type="text"
+                          value={item.name}
+                          onChange={(e) => handleUpdateItemName(item.id, e.target.value)}
+                          placeholder="Fee Head Description"
+                          className="flex-1 text-xs font-medium bg-transparent border-0 focus:outline-none text-slate-900 dark:text-slate-100"
+                        />
+                        <div className="flex items-center gap-1 bg-white dark:bg-slate-950 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-800 w-36">
+                          <span className="text-xs text-slate-400 font-semibold">₹</span>
+                          <input
+                            type="number"
+                            min="0"
+                            step="50"
+                            value={item.amount}
+                            onChange={(e) => handleUpdateItemAmount(item.id, Number(e.target.value))}
+                            className="w-full text-xs font-bold text-right bg-transparent border-0 focus:outline-none"
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveItem(item.id)}
+                          className="p-1 text-slate-400 hover:text-rose-500 rounded transition-colors"
+                          title="Delete fee head"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Add Head Form */}
+                  {isAddingHead && (
+                    <div className="p-3.5 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 space-y-2">
+                      <span className="text-xs font-bold text-emerald-900 dark:text-emerald-200">
+                        Add New Custom Fee Particular
+                      </span>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                        <input
+                          type="text"
+                          placeholder="e.g. Special Doubt Clearing / Bus / Lab"
+                          value={newHeadName}
+                          onChange={(e) => setNewHeadName(e.target.value)}
+                          className="sm:col-span-2 text-xs px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900"
+                        />
+                        <input
+                          type="number"
+                          placeholder="Amount (₹)"
+                          min="0"
+                          value={newHeadAmount || ''}
+                          onChange={(e) => setNewHeadAmount(Number(e.target.value))}
+                          className="text-xs px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-right font-bold"
+                        />
+                      </div>
+                      <div className="flex justify-end gap-2 pt-1">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 text-xs"
+                          onClick={() => setIsAddingHead(false)}
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          type="button"
+                          size="sm"
+                          className="h-7 text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-bold"
+                          onClick={handleAddCustomHead}
+                        >
+                          Add Head
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                    <div className="p-3 rounded-xl bg-slate-900 text-white flex items-center justify-between text-xs">
+                      <span className="text-slate-300">Sum of Customized Heads:</span>
+                      <span className="text-sm font-bold text-emerald-400">
+                        {formatCurrency(effectiveGrossFee)}
+                      </span>
+                    </div>
+
+                    <Input
+                      label="Payment Due Date"
+                      type="date"
+                      required
+                      value={dueDate}
+                      onChange={(e) => setDueDate(e.target.value)}
+                    />
+                  </div>
+                </div>
+              )}
 
               {/* Scholarship Presets */}
-              <div className="space-y-2.5">
+              <div className="space-y-2.5 pt-2 border-t border-slate-100 dark:border-slate-800">
                 <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
                   <Award className="h-3.5 w-3.5 text-amber-500" />
                   Quick Scholarship & Fee Waiver Presets
@@ -719,7 +947,7 @@ export function StudentRegistrationWizard({
               </div>
 
               {/* Custom Discount Fields */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Input
                   label="Scholarship / Waiver Amount (₹)"
                   type="number"
@@ -736,6 +964,39 @@ export function StudentRegistrationWizard({
                 />
               </div>
 
+              {/* Installments Option Preview */}
+              <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 space-y-2">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 block">
+                  Suggested Installment Options for {formatCurrency(netFee)}
+                </span>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                  <div className="p-2.5 rounded-lg bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
+                    <span className="text-[10px] text-slate-400 block font-semibold">1 Lumpsum</span>
+                    <span className="font-extrabold text-slate-900 dark:text-white">
+                      {formatCurrency(netFee)}
+                    </span>
+                  </div>
+                  <div className="p-2.5 rounded-lg bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
+                    <span className="text-[10px] text-slate-400 block font-semibold">2 Installments</span>
+                    <span className="font-extrabold text-emerald-600">
+                      {formatCurrency(Math.round(netFee / 2))} / each
+                    </span>
+                  </div>
+                  <div className="p-2.5 rounded-lg bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
+                    <span className="text-[10px] text-slate-400 block font-semibold">3 Installments</span>
+                    <span className="font-extrabold text-emerald-600">
+                      {formatCurrency(Math.round(netFee / 3))} / each
+                    </span>
+                  </div>
+                  <div className="p-2.5 rounded-lg bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
+                    <span className="text-[10px] text-slate-400 block font-semibold">4 Quarterly</span>
+                    <span className="font-extrabold text-emerald-600">
+                      {formatCurrency(Math.round(netFee / 4))} / each
+                    </span>
+                  </div>
+                </div>
+              </div>
+
               {/* Special Notes */}
               <div className="space-y-1.5">
                 <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-300">
@@ -744,7 +1005,7 @@ export function StudentRegistrationWizard({
                 <textarea
                   className="w-full rounded-lg border border-slate-200 bg-white p-3 text-xs focus:outline-none focus:ring-2 focus:ring-slate-900 dark:border-slate-800 dark:bg-slate-950"
                   rows={2}
-                  placeholder="Special installment arrangements, scholarship verification document note..."
+                  placeholder="Special installment arrangements, customized fee agreement note..."
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                 />
@@ -803,15 +1064,38 @@ export function StudentRegistrationWizard({
               </div>
 
               {/* Financial summary banner */}
-              <div className="p-4 rounded-xl bg-slate-900 text-white space-y-2">
+              <div className="p-4 rounded-xl bg-slate-900 text-white space-y-3">
                 <div className="flex justify-between text-xs text-slate-300">
-                  <span>Gross Tuition & Coaching Fee:</span>
-                  <span>{formatCurrency(grossFee)}</span>
+                  <span>{feeMode === 'custom' ? 'Customized Gross Fee (Sum of Heads):' : 'Gross Tuition & Coaching Fee:'}</span>
+                  <span className="font-semibold">{formatCurrency(effectiveGrossFee)}</span>
                 </div>
+
+                {feeMode === 'custom' && feeItems.length > 0 && (
+                  <div className="pt-2 pb-1 border-t border-slate-800 space-y-1.5">
+                    <div className="flex items-center justify-between text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                      <span>Itemized Fee Head Breakdown</span>
+                      <span className="text-emerald-400 font-mono">{feeItems.length} Heads</span>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 pt-1">
+                      {feeItems.map((fi) => (
+                        <div
+                          key={fi.id}
+                          className="flex justify-between items-center text-[11px] bg-slate-800/60 px-2.5 py-1.5 rounded-lg border border-slate-800"
+                        >
+                          <span className="text-slate-300 font-medium truncate pr-2">{fi.name}</span>
+                          <span className="font-bold text-emerald-400 font-mono shrink-0">
+                            {formatCurrency(fi.amount)}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 {discountAmount > 0 && (
-                  <div className="flex justify-between text-xs text-emerald-400">
-                    <span>Scholarship / Concession ({discountReason}):</span>
-                    <span>-{formatCurrency(discountAmount)}</span>
+                  <div className="flex justify-between text-xs text-emerald-400 pt-1 border-t border-slate-800">
+                    <span>Scholarship / Concession ({discountReason || 'Discount'}):</span>
+                    <span className="font-semibold">-{formatCurrency(discountAmount)}</span>
                   </div>
                 )}
                 <div className="border-t border-slate-800 pt-2 flex justify-between text-sm font-bold">
@@ -881,13 +1165,29 @@ export function StudentRegistrationWizard({
               </span>
             </div>
 
-            <div className="space-y-2 text-xs">
+            <div className="space-y-2.5 text-xs">
               <div className="flex justify-between text-slate-600 dark:text-slate-400">
-                <span>Standard Fee:</span>
+                <span>{feeMode === 'custom' ? 'Customized Gross Fee:' : 'Standard Fee:'}</span>
                 <span className="font-semibold text-slate-900 dark:text-white">
-                  {formatCurrency(grossFee)}
+                  {formatCurrency(effectiveGrossFee)}
                 </span>
               </div>
+              {feeMode === 'custom' && (
+                <div className="text-[10px] text-emerald-700 dark:text-emerald-300 font-semibold bg-emerald-50 dark:bg-emerald-950/60 p-2 rounded-lg border border-emerald-200 dark:border-emerald-800 space-y-1">
+                  <div className="flex items-center justify-between">
+                    <span>✓ Custom Structure</span>
+                    <span>{feeItems.length} heads</span>
+                  </div>
+                  <div className="max-h-24 overflow-y-auto space-y-0.5 pt-1 border-t border-emerald-100 dark:border-emerald-800/80">
+                    {feeItems.map((fi) => (
+                      <div key={fi.id} className="flex justify-between text-[10px] text-slate-600 dark:text-slate-400">
+                        <span className="truncate max-w-[120px]">{fi.name}:</span>
+                        <span className="font-mono font-medium">{formatCurrency(fi.amount)}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
               <div className="flex justify-between text-slate-600 dark:text-slate-400">
                 <span>Scholarship Waiver:</span>
                 <span className="font-semibold text-emerald-600">
@@ -918,3 +1218,4 @@ export function StudentRegistrationWizard({
     </div>
   );
 }
+

@@ -26,6 +26,13 @@ export interface Batch {
   course?: Course;
 }
 
+export interface FeeItem {
+  id: string;
+  name: string;
+  amount: number;
+  category?: 'tuition' | 'admission' | 'material' | 'exam' | 'other';
+}
+
 export interface FeeStructure {
   id: string;
   course_id: string;
@@ -62,6 +69,7 @@ export interface Student {
   due_date?: string;
   student_status: StudentStatus;
   notes?: string;
+  custom_fee_items?: FeeItem[];
   created_at?: string;
   course?: Course;
   batch?: Batch;

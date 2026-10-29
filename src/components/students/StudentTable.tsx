@@ -5,7 +5,7 @@ import { Student, Course, Batch, PaymentStatus } from '@/types';
 import { formatCurrency, formatDate, getStatusBadgeClass } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, Filter, Receipt, Eye, Mail, MoreHorizontal, UserCheck, AlertCircle } from 'lucide-react';
+import { Search, Filter, Receipt, Eye, Mail, MoreHorizontal, UserCheck, AlertCircle, Sliders } from 'lucide-react';
 
 interface StudentTableProps {
   students: Student[];
@@ -15,6 +15,7 @@ interface StudentTableProps {
   onRecordPayment: (student: Student) => void;
   onSendReminder: (student: Student) => void;
   onEditStudent: (student: Student) => void;
+  onCustomizeFee?: (student: Student) => void;
 }
 
 export function StudentTable({
@@ -25,6 +26,7 @@ export function StudentTable({
   onRecordPayment,
   onSendReminder,
   onEditStudent,
+  onCustomizeFee,
 }: StudentTableProps) {
   const [searchTerm, setSearchTerm] = React.useState('');
   const [selectedCourse, setSelectedCourse] = React.useState<string>('all');
@@ -228,6 +230,18 @@ export function StudentTable({
                           <Eye className="h-3.5 w-3.5" />
                         </Button>
 
+                        {onCustomizeFee && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 px-2 text-xs text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 dark:hover:bg-indigo-950/40"
+                            onClick={() => onCustomizeFee(student)}
+                            title="Customize Student Fees"
+                          >
+                            <Sliders className="h-3.5 w-3.5" />
+                          </Button>
+                        )}
+
                         {student.balance_amount > 0 && (
                           <Button
                             variant="outline"
@@ -330,6 +344,17 @@ export function StudentTable({
                   <Eye className="h-3 w-3 mr-1" />
                   View
                 </Button>
+                {onCustomizeFee && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-xs h-8 text-indigo-600 border-indigo-200 dark:border-indigo-800"
+                    onClick={() => onCustomizeFee(student)}
+                  >
+                    <Sliders className="h-3 w-3 mr-1" />
+                    Fees
+                  </Button>
+                )}
                 {student.balance_amount > 0 && (
                   <Button
                     size="sm"

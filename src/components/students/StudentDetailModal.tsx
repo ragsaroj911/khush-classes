@@ -8,7 +8,8 @@ import { Student, Payment } from '@/types';
 import { DataService } from '@/lib/storage';
 import { formatCurrency, formatDate, getStatusBadgeClass, getPaymentMethodLabel } from '@/lib/utils';
 import { generateReceiptPdf } from '@/lib/receipt-generator';
-import { Receipt, Mail, Download, Phone, Calendar, BookOpen, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { CustomizeFeeModal } from './CustomizeFeeModal';
+import { Receipt, Mail, Download, Phone, Calendar, BookOpen, AlertCircle, CheckCircle2, Sliders, Layers } from 'lucide-react';
 
 interface StudentDetailModalProps {
   student: Student | null;
@@ -16,17 +17,25 @@ interface StudentDetailModalProps {
   onClose: () => void;
   onRecordPaymentClick?: (student: Student) => void;
   onSendReminderClick?: (student: Student) => void;
+  onStudentUpdated?: (student: Student) => void;
 }
 
 export function StudentDetailModal({
-  student,
+  student: initialStudent,
   isOpen,
   onClose,
   onRecordPaymentClick,
   onSendReminderClick,
+  onStudentUpdated,
 }: StudentDetailModalProps) {
+  const [student, setStudent] = React.useState<Student | null>(initialStudent);
   const [payments, setPayments] = React.useState<Payment[]>([]);
   const [loading, setLoading] = React.useState(false);
+  const [isCustomizeFeeOpen, setIsCustomizeFeeOpen] = React.useState(false);
+
+  React.useEffect(() => {
+    setStudent(initialStudent);
+  }, [initialStudent]);
 
   React.useEffect(() => {
     async function loadPayments() {
@@ -106,22 +115,33 @@ export function StudentDetailModal({
           </div>
         </div>
 
-        {/* Action Buttons Bar */}
+        {/* Action Buttons Bar with "Customize Fees" */}
         <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             {student.balance_amount > 0 && onRecordPaymentClick && (
               <Button
                 size="sm"
-                className="bg-emerald-600 hover:bg-emerald-700 text-white gap-1.5"
+                className="bg-emerald-600 hover:bg-emerald-700 text-white gap-1.5 font-bold"
                 onClick={() => {
                   onClose();
                   onRecordPaymentClick(student);
                 }}
               >
                 <Receipt className="h-3.5 w-3.5" />
-                Record Payment
+                Record Payment (₹)
               </Button>
             )}
+
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-1.5 border-emerald-300 text-emerald-800 hover:bg-emerald-50 dark:border-emerald-700 dark:text-emerald-400 font-bold"
+              onClick={() => setIsCustomizeFeeOpen(true)}
+              title="Customize student fee structure and items"
+            >
+              <Sliders className="h-3.5 w-3.5" />
+              Customize Fee Structure
+            </Button>
 
             {student.balance_amount > 0 && onSendReminderClick && (
               <Button
@@ -139,6 +159,40 @@ export function StudentDetailModal({
             )}
           </div>
         </div>
+
+        {/* Customized Fee Heads Breakdown (if customized) */}
+        {student.custom_fee_items && student.custom_fee_items.length > 0 && (
+          <div className="p-4 rounded-xl border border-emerald-200 dark:border-emerald-900/60 bg-emerald-50/30 dark:bg-emerald-950/20 space-y-2">
+            <div className="flex items-center justify-between text-xs">
+              <span className="font-bold text-emerald-900 dark:text-emerald-300 flex items-center gap-1.5">
+                <Sliders className="h-3.5 w-3.5 text-emerald-600" />
+                Customized Fee Particulars for this Student
+              </span>
+              <button
+                type="button"
+                onClick={() => setIsCustomizeFeeOpen(true)}
+                className="text-[11px] text-emerald-700 dark:text-emerald-400 underline font-semibold"
+              >
+                Edit Particulars
+              </button>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 text-xs">
+              {student.custom_fee_items.map((item) => (
+                <div
+                  key={item.id}
+                  className="p-2 rounded-lg bg-white dark:bg-slate-900 border border-emerald-100 dark:border-emerald-900/40"
+                >
+                  <span className="text-[10px] text-slate-500 block truncate" title={item.name}>
+                    {item.name}
+                  </span>
+                  <span className="font-bold text-slate-900 dark:text-white">
+                    {formatCurrency(item.amount)}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Detailed Info Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
@@ -262,6 +316,20 @@ export function StudentDetailModal({
           )}
         </div>
       </div>
+
+      {/* Customize Fee Structure Modal */}
+      <CustomizeFeeModal
+        student={student}
+        isOpen={isCustomizeFeeOpen}
+        onClose={() => setIsCustomizeFeeOpen(false)}
+        onFeeUpdated={(updatedStudent) => {
+          setStudent(updatedStudent);
+          if (onStudentUpdated) onStudentUpdated(updatedStudent);
+          if (typeof window !== 'undefined') {
+            window.dispatchEvent(new Event('sfms_data_updated'));
+          }
+        }}
+      />
     </Modal>
   );
 }

@@ -172,28 +172,64 @@ export default function ReceiptPrintPage() {
           <table className="w-full text-left text-xs">
             <thead className="bg-slate-50 dark:bg-slate-950 text-slate-500 uppercase tracking-wider font-semibold border-b border-slate-200 dark:border-slate-800">
               <tr>
-                <th className="p-3 pl-4">Description</th>
-                <th className="p-3">Payment Channel</th>
-                <th className="p-3 pr-4 text-right">Amount Received</th>
+                <th className="p-3 pl-4">Description / Particulars</th>
+                <th className="p-3">Category / Mode</th>
+                <th className="p-3 pr-4 text-right">Amount (₹)</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-              <tr>
-                <td className="p-3 pl-4">
-                  <p className="font-bold text-slate-900 dark:text-white">
-                    Academic Fee Collection
-                  </p>
-                  <p className="text-[11px] text-slate-500">
-                    {payment.remarks || 'Standard tuition & institutional installment'}
-                  </p>
-                </td>
-                <td className="p-3 text-slate-600 dark:text-slate-400">
-                  {getPaymentMethodLabel(payment.payment_method)}
-                </td>
-                <td className="p-3 pr-4 text-right font-extrabold text-slate-900 dark:text-white text-sm">
-                  {formatCurrency(payment.amount)}
-                </td>
-              </tr>
+              {student.custom_fee_items && student.custom_fee_items.length > 0 ? (
+                <>
+                  {student.custom_fee_items.map((head) => (
+                    <tr key={head.id} className="bg-slate-50/40 dark:bg-slate-900/40">
+                      <td className="p-3 pl-4">
+                        <span className="font-semibold text-slate-800 dark:text-slate-200">
+                          {head.name}
+                        </span>
+                      </td>
+                      <td className="p-3 text-slate-500 capitalize">
+                        {head.category || 'Tuition'} Head
+                      </td>
+                      <td className="p-3 pr-4 text-right font-medium text-slate-700 dark:text-slate-300">
+                        {formatCurrency(head.amount)}
+                      </td>
+                    </tr>
+                  ))}
+                  <tr className="bg-emerald-50/60 dark:bg-emerald-950/30">
+                    <td className="p-3 pl-4">
+                      <p className="font-bold text-emerald-900 dark:text-emerald-200">
+                        Payment Credited in this Receipt
+                      </p>
+                      <p className="text-[11px] text-emerald-700 dark:text-emerald-300">
+                        {payment.remarks || 'Official fee installment settlement'}
+                      </p>
+                    </td>
+                    <td className="p-3 text-emerald-800 dark:text-emerald-200 font-semibold">
+                      {getPaymentMethodLabel(payment.payment_method)}
+                    </td>
+                    <td className="p-3 pr-4 text-right font-extrabold text-emerald-700 dark:text-emerald-300 text-sm">
+                      +{formatCurrency(payment.amount)}
+                    </td>
+                  </tr>
+                </>
+              ) : (
+                <tr>
+                  <td className="p-3 pl-4">
+                    <p className="font-bold text-slate-900 dark:text-white">
+                      Academic Fee Collection
+                    </p>
+                    <p className="text-[11px] text-slate-500">
+                      {payment.remarks || 'Standard tuition & institutional installment'}
+                    </p>
+                  </td>
+                  <td className="p-3 text-slate-600 dark:text-slate-400">
+                    {getPaymentMethodLabel(payment.payment_method)}
+                  </td>
+                  <td className="p-3 pr-4 text-right font-extrabold text-slate-900 dark:text-white text-sm">
+                    {formatCurrency(payment.amount)}
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>

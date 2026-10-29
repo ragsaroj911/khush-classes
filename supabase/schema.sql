@@ -77,6 +77,9 @@ CREATE TABLE IF NOT EXISTS public.students (
     due_date DATE,
     student_status VARCHAR(20) NOT NULL DEFAULT 'active', -- 'active', 'graduated', 'suspended'
     
+    -- Customizable itemized fee breakdown
+    custom_fee_items JSONB DEFAULT '[]'::jsonb,
+    
     notes TEXT,
     created_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now()),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now())

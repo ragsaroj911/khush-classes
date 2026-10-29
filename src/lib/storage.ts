@@ -199,11 +199,11 @@ export const INITIAL_STUDENTS: Student[] = [
     roll_number: 'STU-2024-003',
     first_name: 'Rohan',
     last_name: 'Verma',
-    email: 'rohan.verma@example.com',
+    email: 'khushmain8777@gmail.com',
     phone: '+91 98765 43214',
     parent_name: 'Vikram Verma',
     parent_phone: '+91 98765 43215',
-    parent_email: 'vikram.verma@example.com',
+    parent_email: 'khushmain8777@gmail.com',
     course_id: '22222222-2222-2222-2222-222222222222',
     batch_id: 'cccccccc-cccc-cccc-cccc-cccccccccccc',
     admission_date: '2024-08-10',
@@ -360,10 +360,44 @@ function setLocalData<T>(key: string, value: T): void {
 // DATA ACCESS LAYER (HYBRID SUPABASE + LOCAL DEMO ENGINE)
 // =====================================================================
 
+let supabaseSchemaReady: boolean | null = null;
+let lastSchemaCheckTime = 0;
+
+async function isSupabaseSchemaAvailable(): Promise<boolean> {
+  if (!isSupabaseConfigured || !supabase) return false;
+  const now = Date.now();
+  // Cache check for 15 seconds to keep UI fast
+  if (supabaseSchemaReady !== null && (now - lastSchemaCheckTime < 15000)) {
+    return supabaseSchemaReady;
+  }
+  try {
+    const { error } = await supabase.from('courses').select('id').limit(1);
+    lastSchemaCheckTime = now;
+    if (error && error.message?.includes('schema cache')) {
+      supabaseSchemaReady = false;
+    } else {
+      supabaseSchemaReady = true;
+    }
+    return supabaseSchemaReady;
+  } catch {
+    supabaseSchemaReady = false;
+    return false;
+  }
+}
+
 export const DataService = {
+  // Check live Supabase status
+  async checkCloudConnection(): Promise<{ isConfigured: boolean; isSchemaReady: boolean }> {
+    const ready = await isSupabaseSchemaAvailable();
+    return {
+      isConfigured: isSupabaseConfigured,
+      isSchemaReady: ready,
+    };
+  },
+
   // COURSES
   async getCourses(): Promise<Course[]> {
-    if (isSupabaseConfigured && supabase) {
+    if (await isSupabaseSchemaAvailable() && supabase) {
       try {
         const { data, error } = await supabase.from('courses').select('*').order('name');
         if (!error && data && data.length > 0) return data;
@@ -398,7 +432,7 @@ export const DataService = {
 
   // BATCHES
   async getBatches(): Promise<Batch[]> {
-    if (isSupabaseConfigured && supabase) {
+    if (await isSupabaseSchemaAvailable() && supabase) {
       try {
         const { data, error } = await supabase.from('batches').select('*, course:courses(*)').order('name');
         if (!error && data && data.length > 0) return data;
@@ -421,7 +455,7 @@ export const DataService = {
       created_at: new Date().toISOString(),
     };
 
-    if (isSupabaseConfigured && supabase) {
+    if (await isSupabaseSchemaAvailable() && supabase) {
       try {
         const { data, error } = await supabase.from('batches').insert(newBatch).select().single();
         if (!error && data) return data;
@@ -438,7 +472,7 @@ export const DataService = {
 
   // FEE STRUCTURES
   async getFeeStructures(): Promise<FeeStructure[]> {
-    if (isSupabaseConfigured && supabase) {
+    if (await isSupabaseSchemaAvailable() && supabase) {
       try {
         const { data, error } = await supabase.from('fee_structures').select('*');
         if (!error && data && data.length > 0) return data;
@@ -464,7 +498,7 @@ export const DataService = {
       created_at: new Date().toISOString(),
     };
 
-    if (isSupabaseConfigured && supabase) {
+    if (await isSupabaseSchemaAvailable() && supabase) {
       try {
         const { data, error } = await supabase.from('fee_structures').insert(newStruct).select().single();
         if (!error && data) return data;
@@ -481,7 +515,7 @@ export const DataService = {
 
   // STUDENTS
   async getStudents(): Promise<Student[]> {
-    if (isSupabaseConfigured && supabase) {
+    if (await isSupabaseSchemaAvailable() && supabase) {
       try {
         const { data, error } = await supabase
           .from('students')
@@ -584,7 +618,7 @@ export const DataService = {
 
   // PAYMENTS
   async getPayments(): Promise<Payment[]> {
-    if (isSupabaseConfigured && supabase) {
+    if (await isSupabaseSchemaAvailable() && supabase) {
       try {
         const { data, error } = await supabase
           .from('payments')
@@ -668,7 +702,7 @@ export const DataService = {
 
   // REMINDERS
   async getReminders(): Promise<ReminderLog[]> {
-    if (isSupabaseConfigured && supabase) {
+    if (await isSupabaseSchemaAvailable() && supabase) {
       try {
         const { data, error } = await supabase
           .from('reminders')

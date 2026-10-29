@@ -1,233 +1,257 @@
-# 🎓 Student Fee Management System (SFMS)
+# 🎓 Khush Classes — Student Fee Management System (SFMS)
 
-A modern, minimalist, responsive **Student Fee Management System** built with **Next.js (App Router), TypeScript, Tailwind CSS, shadcn/ui, Supabase (PostgreSQL), and Resend**.
+[![Next.js](https://img.shields.io/badge/Next.js-14.2-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.6-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
+[![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3ECF8E?style=for-the-badge&logo=supabase)](https://supabase.com/)
+[![Resend](https://img.shields.io/badge/Resend-Email_API-000000?style=for-the-badge&logo=resend)](https://resend.com/)
+[![Vercel](https://img.shields.io/badge/Deploy-Vercel-000000?style=for-the-badge&logo=vercel)](https://vercel.com/)
 
-Designed for universities, colleges, schools, and coaching academies to handle student admissions, fee structures, payment tracking, pending dues, downloadable PDF receipts, monthly collection analytics, and automated email reminders.
+A modern, minimalist, responsive **Student Fee Management System** built with **Next.js 14 (App Router), TypeScript, Tailwind CSS, shadcn/ui design patterns, Supabase (PostgreSQL), and Resend**.
 
----
-
-## ✨ Features
-
-- **👨‍🎓 Student Registration & Records**:
-  - Full student profile management (Name, Roll No/ID, Email, Phone, Guardian Info, Admission Date).
-  - Course and Cohort/Batch assignment.
-  - Automatic Gross Fee, Scholarship/Waiver deductions, and Net Fee calculations.
-  - Real-time ledger tracking: Paid Amount, Balance Outstanding, and Payment Status (`paid`, `partial`, `pending`, `overdue`).
-
-- **📚 Course & Batch Management**:
-  - Configure degree programs, diploma courses, durations, and default total fees.
-  - Define cohorts and batches with academic year, start/end dates, and capacity caps.
-  - Itemized **Fee Structure Breakdown** (Tuition Fee, Admission Fee, Examination Fee, Lab & Library Fee, Other Charges).
-
-- **💳 Payment Recording & Tracking**:
-  - Multi-channel payment recording: **UPI / QR Code, Cash, Credit/Debit Card, Bank Transfer (NEFT/RTGS), Cheque**.
-  - One-click "Pay Full Remaining Balance" or partial installment payments.
-  - Transaction references, payment date, notes, and cashier records.
-  - Automated unique Receipt Number generation (e.g., `REC-2024-1002`).
-
-- **📄 Downloadable PDF Receipts & Printable Vouchers**:
-  - Instant vector **PDF Receipt Download** generated client-side using `jspdf` and `jspdf-autotable`.
-  - Dedicated **Printable Official Receipt Page** (`/receipt/[id]`) formatted for crisp A4 paper printing (`window.print()`).
-  - Itemized particulars, cumulative payment ledger summary, institutional address, and authorized cashier sign-off.
-
-- **⏰ Pending Dues & Aging Records**:
-  - Dedicated Pending Fee dashboard (`/pending`) filtering by overdue, partial, and pending accounts.
-  - Dynamic Overdue Days aging counter (e.g. `14 days overdue`).
-  - One-click "Collect Payment" or "Send Due Reminder".
-
-- **📧 Fee Due Reminders & Receipts via Resend**:
-  - Direct integration with the official **Resend SDK** for reliable transactional email delivery.
-  - Beautiful, responsive HTML email templates with institutional branding, amount due, and due date.
-  - Automatic email receipt dispatch upon payment confirmation.
-  - **Bulk Overdue Reminders**: 1-click batch dispatch with progress feedback.
-  - Sent reminders audit log with timestamps and Resend message IDs.
-
-- **📊 Monthly Collection Reports & Financial Analytics**:
-  - Real-time KPI summaries: Total Billed, Total Collected, Total Overdue, Collection Efficiency Ratio.
-  - Interactive **Monthly Revenue Trend Bar Chart** across calendar months.
-  - Collections breakdown by payment channel (UPI vs Cash vs Card vs Bank).
-  - Revenue distribution across academic degree programs.
-  - **One-click Export to CSV** for financial auditing and Excel reporting.
-
-- **⚡ Dual-Engine Hybrid Architecture**:
-  - **Live Supabase Mode**: Connects directly to PostgreSQL database with Row Level Security (RLS) policies and triggers.
-  - **Instant Local/Demo Mode**: Out-of-the-box working experience with pre-seeded sample data and local reactivity if environment variables are not yet configured.
+Designed specifically for **Khush Classes** to streamline student admissions, customizable fee structures (itemized heads builder), installment tracking, overdue fee reminders, downloadable vector PDF receipts, and monthly collection reports.
 
 ---
 
-## 🏗️ Tech Stack
+## 🌟 Key Highlights
 
-| Component | Technology |
-|---|---|
-| **Framework** | Next.js 14 (App Router) |
-| **Language** | TypeScript |
-| **Styling** | Tailwind CSS + CSS Variables |
-| **Icons & UI** | Lucide React + shadcn/ui design patterns |
-| **Database & Auth** | Supabase (PostgreSQL 15+, RLS Policies, Triggers) |
-| **Email Service** | Resend API SDK |
-| **PDF Generation** | jsPDF + jspdf-autotable |
-| **Deployment** | Vercel (zero-config SSR/Edge) |
+- 🇮🇳 **Standardized Indian Rupee (`₹` / INR)**: Indian currency format (`en-IN`, e.g. `₹ 1,20,000.00`) across all dashboards, rosters, receipts, and emails.
+- 🛠️ **Customizable Fee Structure (Non-Fixed Fees)**: Custom itemized fee heads builder per student (Tuition, Admission, Study Modules, Test Series, Bus/Transport, Hostel, or Custom Heads).
+- 🚀 **Eye-Catching Guided Admission Wizard**: 4-step interactive enrollment process at `/students/new` with instant roll number generation (`KC-2024-XXX`).
+- 🔙 **Persistent Top-Right Back Button**: One-click navigation returning step-by-step across all subpages until reaching the Home Dashboard.
+- ⚡ **Dual-Engine Data Layer**: Connects to live **Supabase PostgreSQL** with automated fallback to local storage for zero-downtime testing.
+- 📄 **Vector PDF Receipts & Printable Vouchers**: Instant client-side PDF generation (`jspdf`) + print-ready official vouchers (`/receipt/[id]`).
+- ✉️ **Resend Transactional Emails**: Automated payment confirmations and overdue fee reminders with HTML styling.
 
 ---
 
-## 📁 Project Structure
+## ✨ Features Breakdown
+
+### 1. 👨‍🎓 Student Management & Fee Customization
+- **Eye-Catching 4-Step Registration Wizard (`/students/new`)**:
+  - **Step 1: Student Profile** — Personal info, parent/guardian contact, auto-generating Roll Number (`KC-2024-XXX`).
+  - **Step 2: Program & Cohort** — Course selection with real-time batch intake capacity badges.
+  - **Step 3: Customizable Fee Heads Builder** — Toggle between package lump-sum or flexible itemized heads. Add custom heads with user-defined descriptions and amounts. Includes 1-click scholarship presets (*Merit 90%+*, *Early Bird*, *Sibling Concession*, *EWS Support*).
+  - **Step 4: Admission Review & Confirmation** — Complete financial summary with installment schedules (1 lumpsum, 2/3/4 installments).
+- **Direct Fee Customization Modal**: Edit or adjust fee heads for any existing student directly from the student roster or detail ledger without re-registering.
+
+### 2. 💳 Payment Tracking & Collection
+- Multiple payment channels supported: **UPI / QR Code, Cash, Credit/Debit Card, Bank Transfer (NEFT/RTGS), Cheque**.
+- Dynamic balance calculation: `Gross Fee - Scholarship = Net Fee`, `Net Fee - Paid Amount = Balance Due`.
+- Automatic payment status badges: `Paid in Full`, `Partial Payment`, `Pending`, `Overdue`.
+- Automated unique Receipt Number generation (e.g. `REC-2024-1001`).
+
+### 3. 📄 Official PDF Receipts & Printable Vouchers
+- Client-side vector **PDF Receipt** generation using `jspdf` and `jspdf-autotable`.
+- Itemized fee particulars table listing each customized fee component and payment credit.
+- Dedicated web voucher view (`/receipt/[id]`) optimized for clean A4 printing (`window.print()`).
+- Institutional header, student details, payment method, reference transaction ID, and cashier signature line.
+
+### 4. ⏰ Pending Dues & Automated Email Reminders (Resend)
+- Dedicated Pending Dues tracker (`/pending`) filtering partial, pending, and overdue accounts.
+- Overdue aging counter (e.g. *14 days overdue*).
+- 1-click individual or bulk email due reminders powered by **Resend**.
+- Clean, responsive HTML email templates with payment particulars and institutional branding.
+- Sent reminder audit history with delivery timestamps and Resend message IDs.
+
+### 5. 📊 Analytics, Reports & CSV Export
+- Executive KPI summary cards: Total Billed, Total Collected, Total Outstanding, Collection Efficiency Ratio.
+- Monthly collection bar chart and payment channel distribution (UPI vs Cash vs Card vs Bank).
+- One-click **Export to CSV** for spreadsheets and accounting audits.
+
+---
+
+## 🏗️ Technology Architecture
 
 ```
-├── public/                 # Static assets & icons
+┌─────────────────────────────────────────────────────────────┐
+│                   Next.js 14 App Router                     │
+│  (React 18, TypeScript, Tailwind CSS, Lucide React Icons)  │
+└──────────────┬──────────────────────────────┬───────────────┘
+               │                              │
+               ▼                              ▼
+    ┌────────────────────┐         ┌────────────────────┐
+    │  Supabase (Cloud)  │         │    Resend Email    │
+    │  PostgreSQL 15+    │         │  Transactional API │
+    │  - RLS Policies    │         │  - Payment Receipt │
+    │  - Fee Triggers    │         │  - Due Reminders   │
+    │  - Schema Cascade  │         │  - HTML Templates  │
+    └────────────────────┘         └────────────────────┘
+```
+
+| Component | Technology | Description |
+| :--- | :--- | :--- |
+| **Framework** | Next.js 14 (App Router) | Modern React framework with hybrid SSR & Client components |
+| **Language** | TypeScript 5.6 | Strict type-safety across all schemas and API routes |
+| **Styling** | Tailwind CSS 3.4 | Clean, responsive, minimalist institutional UI |
+| **Database** | Supabase (PostgreSQL) | Relational database with Row Level Security & Triggers |
+| **Email Service** | Resend API SDK | Fast, reliable transactional email delivery |
+| **PDF Engine** | jsPDF + Autotable | Vector client-side PDF receipts (zero server overhead) |
+| **Hosting** | Vercel | Seamless zero-config deployment with custom domain support |
+
+---
+
+## 📁 Repository Structure
+
+```
+├── public/                     # Static assets & public files
 ├── src/
-│   ├── app/                # Next.js App Router
-│   │   ├── api/            # API Route Handlers
-│   │   │   ├── payments/   # Payment receipt email endpoint
-│   │   │   └── reminders/  # Fee reminder email endpoint
-│   │   ├── courses/        # Course and batch management
-│   │   ├── payments/       # Collections ledger & PDF receipts
-│   │   ├── pending/        # Pending dues & overdue aging view
-│   │   ├── receipt/[id]/   # Printable official voucher view
-│   │   ├── reminders/      # Resend email logs & bulk dispatch
-│   │   ├── reports/        # Collection reports & financial analytics
-│   │   ├── students/       # Student directory & registration
-│   │   ├── globals.css     # Design system & print stylesheets
-│   │   ├── layout.tsx      # Root layout
-│   │   └── page.tsx        # Executive Dashboard
-│   ├── components/         # Reusable UI & Feature components
-│   │   ├── courses/        # Course & Batch manager
-│   │   ├── layout/         # Sidebar, AppShell, Mobile navigation
-│   │   ├── payments/       # Payment modals & history tables
-│   │   ├── reminders/      # Due reminders manager & modals
-│   │   ├── reports/        # Analytics & charts
-│   │   ├── students/       # Student table, form & detail modals
-│   │   └── ui/             # Button, Card, Badge, Modal, Input
+│   ├── app/                    # Next.js App Router routes
+│   │   ├── api/                # Backend API route handlers
+│   │   │   ├── payments/       # Payment receipt email endpoint
+│   │   │   └── reminders/      # Fee due reminder email endpoint
+│   │   ├── courses/            # Course & Batch catalog page
+│   │   ├── payments/           # Payments ledger & receipt downloads
+│   │   ├── pending/            # Pending & overdue student dues
+│   │   ├── receipt/[id]/       # Printable official voucher view
+│   │   ├── reminders/          # Resend email logs & bulk dispatch
+│   │   ├── reports/            # Monthly collection reports & charts
+│   │   ├── students/           # Student directory & registry
+│   │   │   └── new/            # 4-Step Student Registration Wizard
+│   │   ├── globals.css         # Global styles & print utilities
+│   │   ├── layout.tsx          # Root layout with AppShell wrapper
+│   │   └── page.tsx            # Executive Dashboard
+│   ├── components/
+│   │   ├── courses/            # Course and batch modals & lists
+│   │   ├── layout/             # Top-right Back Button, Sidebar, Navbar
+│   │   ├── payments/           # Record payment modal & vouchers
+│   │   ├── reminders/          # Due reminder modal & logs
+│   │   ├── reports/            # Visual financial charts
+│   │   ├── students/           # StudentTable, RegistrationWizard, CustomizeFeeModal
+│   │   └── ui/                 # Accessible button, card, badge, modal, input
 │   ├── lib/
-│   │   ├── receipt-generator.ts # High-fidelity jsPDF engine
-│   │   ├── resend.ts            # Resend email templates & client
-│   │   ├── storage.ts           # Hybrid Supabase / Local storage engine
-│   │   ├── utils.ts             # Currency, Date, Status helpers
-│   │   └── supabase/            # Client and server Supabase clients
-│   └── types/                   # TypeScript interfaces & types
+│   │   ├── receipt-generator.ts# High-fidelity jsPDF receipt generator
+│   │   ├── resend.ts           # Resend email service & templates
+│   │   ├── storage.ts          # Dual-engine Supabase & Local storage layer
+│   │   ├── utils.ts            # Indian Rupee (₹), date, and badge helpers
+│   │   └── supabase/           # Supabase client initialization
+│   └── types/                  # TypeScript interfaces (Student, FeeItem, Payment)
 ├── supabase/
-│   └── schema.sql          # Complete PostgreSQL schema, RLS, triggers & seed
-├── .env.example            # Environment variables template
-└── README.md
+│   └── schema.sql              # Complete PostgreSQL schema, RLS, triggers & seed
+├── .env.example                # Clean environment variables template
+├── .gitignore                  # Git ignore rules (protects private keys)
+├── next.config.mjs             # Next.js configuration
+├── package.json                # Project dependencies and build scripts
+├── tsconfig.json               # TypeScript compiler configuration
+└── README.md                   # Documentation & setup guide
 ```
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Local Development Setup
 
-### 1. Clone & Install Dependencies
-
+### 1. Clone the Repository
 ```bash
-git clone <your-github-repo-url>
-cd student-fee-management
+git clone https://github.com/<your-username>/<repo-name>.git
+cd <repo-name>
+```
+
+### 2. Install Dependencies
+```bash
 npm install
 ```
 
-### 2. Configure Environment Variables
-
-Create `.env.local` based on `.env.example`:
-
+### 3. Configure Environment Variables
+Create a `.env.local` file in the root directory by copying `.env.example`:
 ```bash
 cp .env.example .env.local
 ```
 
-Edit `.env.local`:
-
+Fill in your configuration details:
 ```env
-# Supabase Configuration
-NEXT_PUBLIC_SUPABASE_URL=https://your-project-ref.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+# 1. Supabase (PostgreSQL Database)
+NEXT_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-supabase-service-role-key
 
-# Resend Configuration
-RESEND_API_KEY=re_your_api_key_here
-RESEND_FROM_EMAIL=Fee Management <onboarding@resend.dev>
+# 2. Resend (Email Notifications)
+RESEND_API_KEY=re_your_resend_api_key
+RESEND_FROM_EMAIL=Khush Classes <onboarding@resend.dev>
 
-# Institution Details
+# 3. Application & Institution Branding
 NEXT_PUBLIC_APP_URL=http://localhost:3000
-NEXT_PUBLIC_INSTITUTE_NAME=Apex International Institute
-NEXT_PUBLIC_INSTITUTE_ADDRESS=Sector 62, Knowledge Boulevard, Institutional Area
-NEXT_PUBLIC_INSTITUTE_PHONE=+91 120 4567 890
-NEXT_PUBLIC_INSTITUTE_EMAIL=fees@apex-institute.edu
+NEXT_PUBLIC_INSTITUTE_NAME=Khush Classes
+NEXT_PUBLIC_INSTITUTE_TAGLINE=Premier Coaching & Academic Excellence
+NEXT_PUBLIC_INSTITUTE_ADDRESS=Main Market Road, Knowledge Park, Delhi NCR
+NEXT_PUBLIC_INSTITUTE_PHONE=+91 98765 43210
+NEXT_PUBLIC_INSTITUTE_EMAIL=fees@khushclasses.com
 NEXT_PUBLIC_CURRENCY_SYMBOL=₹
 ```
 
-> **Note:** If you run without keys, the system automatically launches in **Local Demo Mode** with pre-seeded data so you can test all features immediately!
+> **Note:** If environment variables are omitted during initial local testing, the application automatically launches in **Local Demo Mode** with pre-seeded Khush Classes records.
 
-### 3. Run Development Server
-
+### 4. Run the Development Server
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+Open [http://localhost:3000](http://localhost:3000) (or the active port specified) in your browser.
 
 ---
 
-## 🗄️ Supabase PostgreSQL Database Setup
+## 🗄️ Database Setup (Supabase)
 
-1. Create a new project at [Supabase Dashboard](https://supabase.com).
-2. Go to the **SQL Editor** tab in your Supabase project.
-3. Open `supabase/schema.sql` from this repository.
-4. Copy and paste the entire SQL contents into the SQL Editor and click **Run**.
-5. It will:
+1. Create a project at [supabase.com](https://supabase.com).
+2. Go to the **SQL Editor** tab in your Supabase project dashboard.
+3. Open [`supabase/schema.sql`](supabase/schema.sql) in this repository.
+4. Copy the entire file contents and paste them into the SQL Editor.
+5. Click **Run** (`Ctrl + Enter`).
+6. The script will:
    - Create tables: `courses`, `batches`, `fee_structures`, `students`, `payments`, `reminders`.
-   - Setup foreign keys with integrity cascades.
-   - Attach the **automatic fee recalculation trigger** `recalculate_student_fees()` on `payments`.
-   - Enable Row Level Security (RLS) with secure policies.
-   - Insert starter sample degree courses, cohorts, and student records.
-6. Copy your project URL and keys from **Settings -> API** into your `.env.local`.
+   - Add `custom_fee_items` JSONB support for itemized fee customization.
+   - Attach automatic payment balance recalculation triggers.
+   - Configure Row Level Security (RLS) policies.
+   - Seed starter courses, batches, and student records.
 
 ---
 
-## ✉️ Resend Email Setup
+## ☁️ Deploy to Vercel (Production Ready)
 
-1. Sign up for free at [Resend.com](https://resend.com).
-2. Generate an API Key under **API Keys**.
-3. For testing, set `RESEND_FROM_EMAIL=onboarding@resend.dev` (delivered to your registered Resend email address).
-4. For production, add your custom domain (e.g. `mail.apex-institute.edu`) in Resend and verify DNS records (DKIM, SPF).
+This repository is optimized for zero-config deployment on **Vercel**.
 
----
+### Step 1: Push Code to GitHub
+```bash
+git add .
+git commit -m "feat: complete student fee management system for Khush Classes"
+git branch -M main
+git remote add origin https://github.com/<your-username>/<your-repo-name>.git
+git push -u origin main
+```
 
-## 🌐 Deploy to Vercel & Connect Custom Domain
-
-### Option A: Deploy via GitHub (Recommended)
-
-1. Push your project to a GitHub repository:
-   ```bash
-   git init
-   git add .
-   git commit -m "feat: initial student fee management system"
-   git branch -M main
-   git remote add origin https://github.com/<your-username>/<repo-name>.git
-   git push -u origin main
-   ```
-2. Go to [vercel.com](https://vercel.com) and click **"Add New Project"**.
-3. Import your GitHub repository.
-4. In the **Environment Variables** section, copy the variables from `.env.local`:
+### Step 2: Import into Vercel
+1. Log in to [vercel.com](https://vercel.com) and click **"Add New" $\rightarrow$ "Project"**.
+2. Select your GitHub repository and click **Import**.
+3. Under **Environment Variables**, add the variables from `.env.local`:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
    - `SUPABASE_SERVICE_ROLE_KEY`
    - `RESEND_API_KEY`
    - `RESEND_FROM_EMAIL`
+   - `NEXT_PUBLIC_APP_URL` (set to your Vercel URL e.g. `https://khushclasses.vercel.app`)
    - `NEXT_PUBLIC_INSTITUTE_NAME`
    - `NEXT_PUBLIC_CURRENCY_SYMBOL`
-5. Click **Deploy**. Vercel will build and assign a production URL (e.g., `https://sfms.vercel.app`).
+4. Click **Deploy**. Vercel will compile and deploy your production app in under 60 seconds.
 
-### Option B: Connect a Custom Domain on Vercel
-
-1. In your Vercel project dashboard, navigate to **Settings -> Domains**.
-2. Enter your custom domain (e.g. `fees.apex-institute.edu` or `apexfees.com`).
-3. Add the DNS records shown by Vercel in your domain registrar (GoDaddy, Namecheap, Cloudflare, Google Domains):
-   - **Type A**: `76.76.21.21` (for apex domain)
-   - **Type CNAME**: `cname.vercel-dns.com` (for subdomain like `fees.apex-institute.edu`)
-4. Vercel automatically issues and renews an SSL certificate.
+### Step 3: Connect a Custom Domain (Optional)
+1. In your Vercel Project Dashboard, navigate to **Settings $\rightarrow$ Domains**.
+2. Enter your custom domain (e.g. `fees.khushclasses.com` or `khushclasses.com`).
+3. Add the DNS records provided by Vercel in your domain registrar (GoDaddy, Namecheap, Cloudflare):
+   - **Type A**: `76.76.21.21` (for root domain)
+   - **Type CNAME**: `cname.vercel-dns.com` (for subdomain)
+4. Vercel will automatically provision and manage free SSL certificates.
 
 ---
 
-## 🔒 Security & Best Practices
+## 🔒 Security & Data Integrity
 
-- **Row Level Security (RLS)**: Enforced on all Supabase tables so data cannot be tampered with directly.
-- **Environment Isolation**: Private API keys (`SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`) are kept on the server and never exposed to the client.
-- **Accurate Calculations**: Balances and statuses are strictly calculated and clamped against negative numbers (`Math.max(net_fee - paid, 0)`).
-- **Client-Side PDF Generation**: Does not require heavy serverless headless chromium instances, ensuring zero memory timeouts and 100% reliable receipt downloads.
+- **Protected Secrets**: Private API keys (`SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`) run only on server handlers and are never exposed to client browsers.
+- **Git Security**: `.gitignore` strictly excludes `.env*.local` and `.env` files to prevent credentials from entering version control.
+- **PostgreSQL Row Level Security (RLS)**: Enforced on all Supabase tables.
+- **Accurate Balance Math**: All fee calculations enforce non-negative constraints using `Math.max(net_fee - paid_amount, 0)`.
+- **Client-Side PDF Architecture**: `jspdf` executes directly in the user's browser, eliminating heavy headless browser requirements on serverless runtimes.
 
+---
+
+## 📄 License
+
+This project is licensed under the [MIT License](LICENSE). Built for **Khush Classes**.

@@ -87,6 +87,30 @@ export function generateReceiptPdf(
   doc.setTextColor(15, 23, 42);
   doc.text('Payment Particulars', 15, currentY);
 
+  const tableRows = (student.custom_fee_items && student.custom_fee_items.length > 0)
+    ? [
+        ...student.custom_fee_items.map((item, idx) => [
+          String(idx + 1).padStart(2, '0'),
+          item.name,
+          'Fee Head',
+          `${currencySymbol} ${Number(item.amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`,
+        ]),
+        [
+          'REC',
+          `Payment Received towards Student Account`,
+          getPaymentMethodLabel(payment.payment_method),
+          `${currencySymbol} ${Number(payment.amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`,
+        ],
+      ]
+    : [
+        [
+          '01',
+          `Tuition & Academic Fees (${course?.code || 'Term Fee'})`,
+          getPaymentMethodLabel(payment.payment_method),
+          `${currencySymbol} ${Number(payment.amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`,
+        ],
+      ];
+
   autoTable(doc, {
     startY: currentY + 4,
     theme: 'striped',
@@ -98,20 +122,13 @@ export function generateReceiptPdf(
     },
     styles: { fontSize: 9, cellPadding: 3.5 },
     columnStyles: {
-      0: { cellWidth: 25 },
-      1: { cellWidth: 85 },
+      0: { cellWidth: 20 },
+      1: { cellWidth: 90 },
       2: { cellWidth: 35 },
       3: { cellWidth: 35, halign: 'right' },
     },
-    head: [['Sr No.', 'Description', 'Payment Mode', 'Amount']],
-    body: [
-      [
-        '01',
-        `Tuition & Academic Fees (${course?.code || 'Term Fee'})`,
-        getPaymentMethodLabel(payment.payment_method),
-        `${currencySymbol} ${Number(payment.amount).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`,
-      ],
-    ],
+    head: [['Sr No.', 'Description', 'Particular / Mode', 'Amount']],
+    body: tableRows,
   });
 
   // Financial summary

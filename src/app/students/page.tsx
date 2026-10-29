@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { StudentTable } from '@/components/students/StudentTable';
 import { StudentDetailModal } from '@/components/students/StudentDetailModal';
 import { StudentFormModal } from '@/components/students/StudentFormModal';
+import { CustomizeFeeModal } from '@/components/students/CustomizeFeeModal';
 import { RecordPaymentModal } from '@/components/payments/RecordPaymentModal';
 import { SendReminderModal } from '@/components/reminders/SendReminderModal';
 import { Button } from '@/components/ui/button';
@@ -27,6 +28,8 @@ export default function StudentsPage() {
   const [isPaymentOpen, setIsPaymentOpen] = React.useState(false);
   const [studentForReminder, setStudentForReminder] = React.useState<Student | null>(null);
   const [isReminderOpen, setIsReminderOpen] = React.useState(false);
+  const [studentForCustomizeFee, setStudentForCustomizeFee] = React.useState<Student | null>(null);
+  const [isCustomizeFeeOpen, setIsCustomizeFeeOpen] = React.useState(false);
 
   const loadData = React.useCallback(async () => {
     try {
@@ -154,6 +157,10 @@ export default function StudentsPage() {
             setStudentToEdit(s);
             setIsFormOpen(true);
           }}
+          onCustomizeFee={(s) => {
+            setStudentForCustomizeFee(s);
+            setIsCustomizeFeeOpen(true);
+          }}
         />
       )}
 
@@ -200,6 +207,16 @@ export default function StudentsPage() {
           setStudentForReminder(null);
         }}
         onReminderSent={() => loadData()}
+      />
+
+      <CustomizeFeeModal
+        student={studentForCustomizeFee}
+        isOpen={isCustomizeFeeOpen}
+        onClose={() => {
+          setIsCustomizeFeeOpen(false);
+          setStudentForCustomizeFee(null);
+        }}
+        onFeeUpdated={() => loadData()}
       />
     </div>
   );
