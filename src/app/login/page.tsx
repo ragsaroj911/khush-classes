@@ -58,8 +58,8 @@ function LoginFormContent() {
   };
 
   const handleQuickFillAdmin = () => {
-    setEmail('khushmain8777@gmail.com');
-    setPassword('Vikram@3000');
+    setEmail(process.env.NEXT_PUBLIC_ADMIN_EMAIL || '');
+    setPassword(process.env.NEXT_PUBLIC_ADMIN_DEFAULT_PASS || '');
     setErrorMessage(null);
   };
 

@@ -63,9 +63,7 @@ Designed specifically for **Khush Classes** to streamline student admissions, cu
 ### 6. 🔐 Supabase Authentication, Staff Logins & Logout
 - **Protected Portal Access:** Without logging in, users cannot access any dashboard or institutional records; requests automatically redirect to `/login`.
 - **Primary Administrator Account:**
-  - **Login Email:** `khushmain8777@gmail.com`
-  - **Password:** `Vikram@3000`
-  - Pre-configured in Supabase Authentication with full administrative privileges.
+  - Configurable via Supabase Auth and environment variables (`NEXT_PUBLIC_ADMIN_EMAIL`).
 - **Admin-Only User Management (`/users`)**:
   - The Primary Administrator has exclusive access to the **"Staff & Logins"** console.
   - Create new authorized staff, cashier, or additional administrator accounts directly in Supabase Auth via `/api/admin/users`.

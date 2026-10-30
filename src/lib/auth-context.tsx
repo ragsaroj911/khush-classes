@@ -19,8 +19,8 @@ const AuthContext = React.createContext<AuthContextType | undefined>(undefined);
 const AUTH_STORAGE_KEY = 'sfms_auth_user';
 const STAFF_STORAGE_KEY = 'sfms_registered_staff';
 
-const PRIMARY_ADMIN_EMAIL = 'khushmain8777@gmail.com';
-const PRIMARY_ADMIN_PASS = 'Vikram@3000';
+const PRIMARY_ADMIN_EMAIL = process.env.NEXT_PUBLIC_ADMIN_EMAIL || 'admin@khushclasses.com';
+const PRIMARY_ADMIN_PASS = process.env.NEXT_PUBLIC_ADMIN_DEFAULT_PASS || 'Admin@Khush123';
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
