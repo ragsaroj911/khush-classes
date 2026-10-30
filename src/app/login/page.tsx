@@ -11,7 +11,6 @@ import {
   EyeOff,
   ArrowRight,
   ShieldCheck,
-  Sparkles,
   AlertCircle,
   IndianRupee,
 } from 'lucide-react';
@@ -57,12 +56,6 @@ function LoginFormContent() {
     }
   };
 
-  const handleQuickFillAdmin = () => {
-    setEmail(process.env.NEXT_PUBLIC_ADMIN_EMAIL || '');
-    setPassword(process.env.NEXT_PUBLIC_ADMIN_DEFAULT_PASS || '');
-    setErrorMessage(null);
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-950 to-emerald-950 flex flex-col justify-center items-center p-4 sm:p-6 select-none">
       {/* Background ambient lighting effects */}
@@ -99,26 +92,6 @@ function LoginFormContent() {
               Enter your authorized staff or administrator credentials.
             </p>
           </div>
-
-          {/* Quick-Fill Admin Button */}
-          <button
-            type="button"
-            onClick={handleQuickFillAdmin}
-            className="w-full flex items-center justify-between p-3 rounded-xl bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/40 dark:to-teal-950/40 border border-emerald-200 dark:border-emerald-800/80 text-emerald-900 dark:text-emerald-200 text-xs font-semibold hover:border-emerald-300 dark:hover:border-emerald-700 transition-all group"
-          >
-            <div className="flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-emerald-600 shrink-0" />
-              <div className="text-left">
-                <span className="font-bold block">1-Click Admin Credentials</span>
-                <span className="text-[10px] text-emerald-700 dark:text-emerald-300 font-mono">
-                  khushmain8777@gmail.com
-                </span>
-              </div>
-            </div>
-            <span className="text-[11px] font-bold underline group-hover:translate-x-0.5 transition-transform">
-              Fill &rarr;
-            </span>
-          </button>
 
           {/* Error Banner */}
           {errorMessage && (
